@@ -1,0 +1,24 @@
+{
+ "name": "Tri-Cities Passport",
+ "short_name": "Passport",
+ "description": "A self-guided passport tour of Atomic Richland: 21 stops, trivia and badges.",
+ "start_url": "./",
+ "scope": "./",
+ "display": "standalone",
+ "background_color": "#F1F5EF",
+ "theme_color": "#F1F5EF",
+ "icons": [
+  {
+   "src": "icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png",
+   "purpose": "any maskable"
+  },
+  {
+   "src": "icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "any maskable"
+  }
+ ]
+}

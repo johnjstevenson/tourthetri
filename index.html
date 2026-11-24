@@ -1,0 +1,1935 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="description" content="A self-guided passport tour of Atomic Richland: 21 stops, trivia and badges."><meta name="theme-color" content="#F1F5EF" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#0E2026" media="(prefers-color-scheme: dark)"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" type="image/png" href="icon-192.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Passport"><style>:root{color-scheme:light;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style></head><body><meta name="claude:viewport-fit-sides" content="cover">
+<title>Tri-Cities Passport</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,400;0,500;0,600;0,700;1,500&family=Space+Mono:wght@400;700&family=Yellowtail&display=swap">
+<style>
+/* Layout: a one-screen field app. A slim sign-board header, then the map, the stop list or the badge page,
+   with three tabs along the bottom and a passport-page card that rises over it all.
+   Phone first; when wide, the map stays put and the list or badges sit beside it. */
+:root {
+  --bg: #F1F5EF;          /* formica white */
+  --surface: #FFFFFF;
+  --land: #E3ECE3;
+  --ink: #16303A;
+  --ink-2: #4A6169;
+  --line: #C6D4CC;
+  --river: #86CCCB;
+  --river-ink: #0E5F68;
+  --road: #B9C9C0;
+  --road-ink: #5B7178;
+  --walk: #C8401F;  --on-walk: #FFFFFF;      /* tomato */
+  --eat: #E5AE2C;   --on-eat: #16303A;       /* mustard */
+  --wheels: #0E7C86; --on-wheels: #FFFFFF;   /* turquoise */
+  --shadow: rgba(22, 48, 58, .22);
+  --scrim: rgba(22, 48, 58, .55);
+  --tile-filter: none;
+  --me: #2D6CDF;           /* you are here */
+  --font-body: "Jost", "Century Gothic", "Futura", system-ui, sans-serif;
+  --font-sign: "Yellowtail", "Brush Script MT", cursive;
+  --font-mono: "Space Mono", ui-monospace, Menlo, monospace;
+  --gutter-l: max(16px, env(safe-area-inset-left, 0px));
+  --gutter-r: max(16px, env(safe-area-inset-right, 0px));
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0E2026; --surface: #16303A; --land: #12282F; --ink: #ECF3EE; --ink-2: #A9BDBD; --line: #2B4650;
+    --river: #1D6C78; --river-ink: #BFE6E6; --road: #33515B; --road-ink: #9DB3B3;
+    --walk: #F0714F; --on-walk: #1A1210; --eat: #F0BE4A; --on-eat: #16252B; --wheels: #46B8C0; --on-wheels: #0E2026;
+    --shadow: rgba(0, 0, 0, .5); --scrim: rgba(0, 0, 0, .62); --tile-filter: invert(1) hue-rotate(180deg) brightness(.92) contrast(.88) saturate(.7); --me: #8DB8FF; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0E2026; --surface: #16303A; --land: #12282F; --ink: #ECF3EE; --ink-2: #A9BDBD; --line: #2B4650;
+  --river: #1D6C78; --river-ink: #BFE6E6; --road: #33515B; --road-ink: #9DB3B3;
+  --walk: #F0714F; --on-walk: #1A1210; --eat: #F0BE4A; --on-eat: #16252B; --wheels: #46B8C0; --on-wheels: #0E2026;
+  --shadow: rgba(0, 0, 0, .5); --scrim: rgba(0, 0, 0, .62); --tile-filter: invert(1) hue-rotate(180deg) brightness(.92) contrast(.88) saturate(.7); --me: #8DB8FF; color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { height: 100%; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.45; overflow: hidden; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+h1, h2, h3, p, dl, dd { margin: 0; }
+
+.app { height: 100%; display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto; }
+
+/* ---------- header ---------- */
+.top { grid-row: 1; grid-column: 1; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-block: 8px; min-width: 0;
+  padding-left: var(--gutter-l); padding-right: var(--gutter-r); background: var(--bg); border-bottom: 2px solid var(--ink); }
+.brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.brand svg { width: 36px; height: 36px; flex: none; }
+.brand-text { display: flex; flex-direction: column; line-height: 1; min-width: 0; overflow: hidden; white-space: nowrap; }
+.brand-kicker { font-family: var(--font-mono); font-size: 10px; letter-spacing: .22em; text-transform: uppercase; color: var(--ink-2); }
+.brand-word { font-family: var(--font-sign); font-size: 30px; line-height: .95; color: var(--walk); }
+
+/* ---------- stage ---------- */
+.stage { grid-row: 2; grid-column: 1; position: relative; min-height: 0; overflow: hidden; overflow: clip; display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); }
+.view { min-height: 0; min-width: 0; display: none; }
+.app[data-view="map"] #view-map, .app[data-view="stops"] #view-stops, .app[data-view="badges"] #view-badges, .app[data-view="passport"] #view-passport { display: block; }
+
+/* ---------- map ---------- */
+#view-map { position: relative; overflow: hidden; overflow: clip; overflow-anchor: none; background: var(--land); touch-action: none; user-select: none; -webkit-user-select: none; }
+#map-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+#pins { position: absolute; inset: 0; pointer-events: none; overflow: hidden; overflow: clip; }
+.pin, .cluster { position: absolute; left: 0; top: 0; border: 0; background: transparent; padding: 0; cursor: pointer; pointer-events: auto; }
+.pin { width: 44px; height: 50px; margin: -48px 0 0 -22px; }
+.pin-shape { position: absolute; left: 6px; top: 9px; width: 32px; height: 32px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg);
+  background: var(--pin); border: 2px solid var(--ink); box-shadow: 0 3px 0 var(--shadow); display: grid; place-items: center; }
+.pin-num { transform: rotate(45deg); font-family: var(--font-mono); font-weight: 700; font-size: 13px; color: var(--on-pin); }
+.pin[data-group="walk"] { --pin: var(--walk); --on-pin: var(--on-walk); }
+.pin[data-group="eat"] { --pin: var(--eat); --on-pin: var(--on-eat); }
+.pin[data-group="wheels"] { --pin: var(--wheels); --on-pin: var(--on-wheels); }
+.pin.is-selected { z-index: 5; }
+.pin.is-selected .pin-shape { width: 40px; height: 40px; left: 2px; top: -1px; border-width: 3px; }
+.pin.is-selected .pin-num { font-size: 15px; }
+.pin-tag { position: absolute; left: 50%; bottom: 100%; transform: translate(-50%, 2px); white-space: nowrap; max-width: 60vw; overflow: hidden; text-overflow: ellipsis;
+  background: var(--ink); color: var(--bg); font-weight: 600; font-size: 13px; padding: 3px 9px; border-radius: 999px; margin-bottom: 10px; }
+.cluster { width: 44px; height: 44px; margin: -22px 0 0 -22px; }
+.cluster span { position: absolute; inset: 3px; border-radius: 50%; background: var(--ink); color: var(--bg); border: 2px solid var(--bg);
+  box-shadow: 0 0 0 2px var(--ink), 0 3px 0 2px var(--shadow); display: grid; place-items: center; font-family: var(--font-mono); font-weight: 700; font-size: 14px; }
+
+.map-chips { position: absolute; top: 10px; left: 0; right: 0; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; touch-action: pan-x;
+  padding-left: var(--gutter-l); padding-right: var(--gutter-r); padding-block: 2px; }
+.map-chips::-webkit-scrollbar { display: none; }
+.chip-btn { flex: none; background: var(--surface); border: 2px solid var(--ink); border-radius: 999px; padding: 6px 13px; font-weight: 600; font-size: 14px;
+  cursor: pointer; min-height: 38px; box-shadow: 0 2px 0 var(--shadow); }
+.chip-btn[aria-pressed="true"] { background: var(--eat); color: var(--on-eat); }
+.map-zoom { position: absolute; right: var(--gutter-r); bottom: 92px; display: flex; flex-direction: column; border: 2px solid var(--ink); border-radius: 12px; overflow: hidden;
+  background: var(--surface); box-shadow: 0 2px 0 var(--shadow); }
+.map-zoom button { width: 44px; height: 44px; border: 0; background: transparent; cursor: pointer; display: grid; place-items: center; }
+.map-zoom svg { width: 16px; height: 16px; }
+.map-zoom button + button { border-top: 2px solid var(--ink); }
+.compass { position: absolute; right: var(--gutter-r); top: 62px; width: 46px; height: 46px; pointer-events: none; }
+.map-foot { position: absolute; left: var(--gutter-l); right: calc(var(--gutter-r) + 56px); bottom: 10px; display: flex; flex-direction: column; gap: 6px; pointer-events: none; }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12px; font-weight: 600; }
+.legend span { display: inline-flex; align-items: center; gap: 5px; background: var(--surface); border: 1.5px solid var(--ink); border-radius: 999px; padding: 2px 9px 2px 6px; }
+.legend i { width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid var(--ink); }
+.scale-row { display: flex; align-items: flex-end; gap: 10px; }
+.scale { font-family: var(--font-mono); font-size: 11px; line-height: 1; flex: none; width: 124px; }
+.scale-bar { height: 7px; border: 2px solid var(--ink); border-top: 0; margin-top: 3px; }
+.map-note { min-width: 0; font-size: 11px; color: var(--ink-2); background: var(--land); padding: 1px 4px; border-radius: 4px; }
+
+/* ---------- stop list ---------- */
+#view-stops, #view-badges, #view-passport { overflow-y: auto; -webkit-overflow-scrolling: touch; padding-block: 14px 28px; padding-left: var(--gutter-l); padding-right: var(--gutter-r); background: var(--bg); }
+.list-intro { margin-bottom: 18px; }
+.list-intro h2 { font-size: 26px; line-height: 1.1; font-weight: 700; text-wrap: balance; }
+.list-intro p { font-size: 15px; color: var(--ink-2); margin-top: 6px; max-width: 60ch; }
+.group + .group { margin-top: 22px; }
+.group-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; border-bottom: 2px solid var(--ink); padding-bottom: 4px; }
+.group-head h2 { font-size: 20px; font-weight: 700; letter-spacing: .01em; text-wrap: balance; }
+.group-count { font-family: var(--font-mono); font-size: 12px; color: var(--ink-2); white-space: nowrap; }
+.group-blurb { font-size: 14px; color: var(--ink-2); margin-top: 4px; }
+.rows { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; }
+.row { width: 100%; display: grid; grid-template-columns: 36px minmax(0, 1fr) auto; gap: 12px; align-items: center; text-align: left; background: transparent; border: 0;
+  border-bottom: 1px solid var(--line); padding: 10px 2px; cursor: pointer; }
+.row-num { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--ink); display: grid; place-items: center; font-family: var(--font-mono); font-weight: 700; font-size: 13px;
+  background: var(--pin); color: var(--on-pin); }
+.row[data-group="walk"], .stop-chip[data-group="walk"], .nextup-btn[data-group="walk"], .slot[data-group="walk"] { --pin: var(--walk); --on-pin: var(--on-walk); }
+.row[data-group="eat"], .stop-chip[data-group="eat"], .nextup-btn[data-group="eat"], .slot[data-group="eat"] { --pin: var(--eat); --on-pin: var(--on-eat); }
+.row[data-group="wheels"], .stop-chip[data-group="wheels"], .nextup-btn[data-group="wheels"], .slot[data-group="wheels"] { --pin: var(--wheels); --on-pin: var(--on-wheels); }
+.row-name { font-weight: 600; font-size: 16px; display: block; }
+.row-tag { font-size: 14px; color: var(--ink-2); display: block; }
+.row.is-selected { background: var(--surface); box-shadow: inset 4px 0 0 var(--ink); }
+.list-foot { margin-top: 22px; font-size: 12px; color: var(--ink-2); }
+
+/* ---------- passport card ---------- */
+.sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; max-height: 78%; display: flex; flex-direction: column; background: var(--surface);
+  border-top: 2px solid var(--ink); border-radius: 18px 18px 0 0; box-shadow: 0 -10px 30px var(--shadow); padding-bottom: env(safe-area-inset-bottom, 0px); }
+/* over the map the card stays shorter, so the chosen pin is still in view above it */
+.app[data-view="map"] .sheet { max-height: 60%; }
+.sheet-head { display: flex; align-items: center; gap: 10px; padding: 10px var(--gutter-r) 8px var(--gutter-l); border-bottom: 1px dashed var(--line); }
+.stamp { width: 44px; height: 44px; flex: none; border-radius: 50%; border: 2px solid var(--ink); display: grid; place-items: center; font-family: var(--font-mono); font-weight: 700; font-size: 16px;
+  background: var(--pin); color: var(--on-pin); box-shadow: inset 0 0 0 3px var(--surface), inset 0 0 0 4px var(--ink); }
+.sheet[data-group="walk"] { --pin: var(--walk); --on-pin: var(--on-walk); }
+.sheet[data-group="eat"] { --pin: var(--eat); --on-pin: var(--on-eat); }
+.sheet[data-group="wheels"] { --pin: var(--wheels); --on-pin: var(--on-wheels); }
+.sheet-meta { display: flex; flex-direction: column; min-width: 0; flex: 1; line-height: 1.15; }
+.sheet-kicker { font-family: var(--font-mono); font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-2); }
+.sheet-group { font-weight: 600; font-size: 14px; }
+.icon-btn { width: 44px; height: 44px; flex: none; border: 2px solid var(--ink); border-radius: 50%; background: transparent; cursor: pointer; display: grid; place-items: center; }
+.icon-btn svg { width: 16px; height: 16px; }
+.sheet-scroll { overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 14px var(--gutter-r) 16px var(--gutter-l); display: flex; flex-direction: column; gap: 12px; min-height: 0; }
+.sheet h2 { font-size: 24px; line-height: 1.12; font-weight: 700; text-wrap: balance; }
+.sheet h2:focus { outline: none; }
+.tagline { font-style: italic; font-weight: 500; font-size: 17px; color: var(--walk); }
+.story { font-size: 17px; line-height: 1.55; max-width: 62ch; }
+.facts { display: flex; flex-direction: column; gap: 10px; border-top: 2px solid var(--ink); padding-top: 12px; max-width: 62ch; }
+.facts div { display: grid; grid-template-columns: 84px minmax(0, 1fr); gap: 10px; align-items: baseline; }
+.facts dt { font-family: var(--font-mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-2); }
+.facts dd { font-size: 15px; }
+.source { font-size: 12px; color: var(--ink-2); max-width: 62ch; }
+.quiet-note { font-size: 14px; font-weight: 600; border: 1.5px solid var(--ink); border-radius: 8px; padding: 6px 10px; align-self: flex-start; }
+.sheet-foot { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; gap: 10px; align-items: end; padding: 10px var(--gutter-r) 10px var(--gutter-l); border-top: 2px solid var(--ink); }
+.btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 8px 12px; border: 2px solid var(--ink); border-radius: 999px; background: transparent;
+  font-weight: 600; font-size: 15px; text-decoration: none; color: var(--ink); cursor: pointer; text-align: center; }
+.btn-solid { background: var(--ink); color: var(--bg); }
+.icon-btn[disabled] { opacity: .35; cursor: default; }
+.card-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.btn-sm { min-height: 38px; padding: 5px 14px; font-size: 14px; }
+.visited-chip { flex: none; font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; border: 1.5px solid var(--ink); border-radius: 999px; padding: 3px 8px; }
+
+/* ---------- check-in ---------- */
+.checkin { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.checkin .btn { width: 100%; }
+.checkin .btn[disabled] { opacity: .6; cursor: progress; }
+.ci-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
+.ci-msg { font-size: 14px; font-weight: 500; line-height: 1.3; }
+.ci-note { font-size: 12px; color: var(--ink-2); text-align: center; line-height: 1.25; }
+.ci-done { display: flex; align-items: center; gap: 10px; min-height: 44px; }
+.ci-check { width: 30px; height: 30px; flex: none; border-radius: 50%; background: var(--ink); color: var(--bg); display: grid; place-items: center; }
+.ci-check svg { width: 14px; height: 14px; }
+.ci-text { display: flex; flex-direction: column; line-height: 1.2; min-width: 0; flex: 1; font-weight: 600; font-size: 15px; }
+.ci-when { font-size: 12px; font-weight: 400; color: var(--ink-2); }
+.link-btn { background: none; border: 0; padding: 0 6px; min-height: 44px; font-weight: 600; font-size: 14px; text-decoration: underline; cursor: pointer; }
+.stamp { position: relative; }
+.pin-check, .row-check { position: absolute; width: 18px; height: 18px; border-radius: 50%; background: var(--ink); color: var(--bg); border: 2px solid var(--bg); display: grid; place-items: center; }
+.pin-check svg, .row-check svg { width: 9px; height: 9px; }
+.pin-check { right: 0; top: 3px; }
+.pin.is-selected .pin-check { right: -4px; top: -7px; }
+.cluster .pin-check { right: -2px; top: -2px; }
+.row-num { position: relative; }
+.row-check { right: -7px; top: -7px; display: none; }
+.row.is-visited .row-check { display: grid; }
+.row-state { font-family: var(--font-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); white-space: nowrap; }
+.progress { display: flex; align-items: center; gap: 10px; margin-top: 12px; max-width: 60ch; }
+.progress-track { flex: 1; height: 12px; border: 2px solid var(--ink); border-radius: 999px; overflow: hidden; background: var(--surface); }
+.progress-fill { display: block; height: 100%; width: 0; background: var(--eat); }
+.progress-label { font-family: var(--font-mono); font-size: 12px; white-space: nowrap; }
+.legend .legend-progress { font-family: var(--font-mono); font-weight: 700; padding: 2px 9px; background: var(--ink); color: var(--bg); }
+.list-foot { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
+.reset-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; font-size: 13px; color: var(--ink); }
+.reset-row .link-btn { padding: 0; }
+.toast { position: fixed; left: 50%; top: calc(env(safe-area-inset-top, 0px) + 10px); transform: translateX(-50%); z-index: 60; pointer-events: none; background: var(--ink); color: var(--bg);
+  font-weight: 600; font-size: 14px; line-height: 1.3; padding: 9px 16px; border-radius: 999px; box-shadow: 0 4px 14px var(--shadow); width: max-content; max-width: min(92vw, 420px); text-align: center; }
+
+/* ---------- trivia ---------- */
+.trivia { border-top: 2px solid var(--ink); padding-top: 12px; display: flex; flex-direction: column; gap: 10px; max-width: 62ch; }
+.trivia-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 24px; }
+.trivia-head h3 { font-family: var(--font-mono); font-size: 11px; font-weight: 400; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-2); }
+.trivia-state { font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; display: inline-flex; align-items: center; gap: 5px; }
+.trivia-state.is-solved { border: 1.5px solid var(--ink); border-radius: 999px; padding: 2px 9px 2px 6px; font-weight: 700; }
+.mini-check { width: 12px; height: 12px; display: inline-grid; place-items: center; flex: none; }
+.mini-check svg { width: 11px; height: 11px; }
+.trivia-locked { display: flex; align-items: center; gap: 10px; font-size: 15px; color: var(--ink-2); border: 1.5px dashed var(--ink-2); border-radius: 12px; padding: 10px 12px; }
+.trivia-locked svg { width: 20px; height: 20px; flex: none; }
+.trivia-q { font-size: 18px; font-weight: 600; line-height: 1.3; text-wrap: balance; }
+.trivia-q:focus, .trivia-verdict:focus { outline: none; }
+.trivia-options { display: flex; flex-direction: column; gap: 8px; }
+.opt { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 10px; align-items: center; width: 100%; min-height: 48px; padding: 8px 12px 8px 8px; text-align: left;
+  border: 2px solid var(--ink); border-radius: 12px; background: var(--surface); color: var(--ink); font-size: 16px; font-weight: 500; line-height: 1.25; cursor: pointer; }
+.opt-key { width: 28px; height: 28px; border-radius: 50%; border: 2px solid currentColor; display: grid; place-items: center; font-family: var(--font-mono); font-weight: 700; font-size: 13px; }
+.opt-body { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.opt-mark { font-family: var(--font-mono); font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; display: inline-flex; align-items: center; gap: 4px; }
+.opt-mark svg { width: 11px; height: 11px; flex: none; }
+.opt[disabled] { cursor: default; }
+.opt.is-right { background: var(--eat); color: var(--on-eat); }
+.opt.is-wrong { border-style: dashed; }
+.opt.is-dim { opacity: .7; }
+.trivia-verdict { font-weight: 700; font-size: 18px; }
+.trivia-explain { font-size: 15px; }
+.trivia .btn { align-self: flex-start; }
+.row-state { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }
+.row-trivia { display: inline-flex; align-items: center; gap: 4px; }
+
+/* ---------- badges ---------- */
+.stats { display: flex; flex-wrap: wrap; gap: 6px 8px; margin-top: 12px; }
+.stat { font-family: var(--font-mono); font-size: 12px; border: 1.5px solid var(--ink); border-radius: 999px; padding: 3px 10px; background: var(--surface); white-space: nowrap; }
+.stat.is-main { background: var(--ink); color: var(--bg); font-weight: 700; }
+.badges { list-style: none; margin: 16px 0 0; padding: 0; display: flex; flex-direction: column; gap: 12px; max-width: 60ch; }
+.badge { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 4px 12px; align-items: start; border: 2px dashed var(--ink-2); border-radius: 14px; padding: 12px; }
+.badge.is-earned { border: 2px solid var(--ink); background: var(--surface); box-shadow: 0 3px 0 var(--shadow); }
+.badge h3 { font-size: 18px; line-height: 1.15; font-weight: 700; text-wrap: balance; }
+.badge-blurb { font-size: 14px; color: var(--ink-2); margin-top: 3px; }
+.badge-meter { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+.badge-meter .progress-track { height: 10px; }
+.badge-status { font-family: var(--font-mono); font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; margin-top: 8px; display: flex; align-items: center; gap: 5px; }
+.badge-more { min-height: 36px; padding: 0; margin-top: 2px; font-size: 13px; }
+.badge-detail { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px; padding-top: 6px; }
+.badge-detail p { font-size: 13px; color: var(--ink-2); }
+.stop-chip, .need-chip { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; max-width: 100%; padding: 4px 11px 4px 5px; border: 1.5px solid var(--ink); border-radius: 999px; background: var(--surface); color: var(--ink);
+  font-size: 13px; font-weight: 600; text-align: left; }
+.stop-chip { cursor: pointer; }
+.need-chip { padding-left: 11px; }
+.stop-chip i { width: 24px; height: 24px; flex: none; border-radius: 50%; border: 1.5px solid var(--ink); display: grid; place-items: center; font-style: normal; font-family: var(--font-mono); font-size: 11px; font-weight: 700;
+  background: var(--pin); color: var(--on-pin); }
+.stop-chip > span:not(.mini-check) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.stop-chip.is-visited, .need-chip.is-visited { background: var(--land); }
+.emblem { width: 64px; height: 64px; display: block; --tone: var(--walk); }
+.emblem[data-tone="eat"] { --tone: var(--eat); }
+.emblem[data-tone="wheels"] { --tone: var(--wheels); }
+.emblem[data-tone="ink"] { --tone: var(--ink); }
+.emblem .burst { fill: var(--tone); stroke: var(--ink); stroke-width: 2; stroke-linejoin: round; }
+.emblem .disc { fill: var(--surface); stroke: var(--ink); stroke-width: 2; }
+.emblem .glyph { color: var(--ink); }
+.emblem.is-locked .burst { fill: none; stroke: var(--ink-2); stroke-width: 1.5; stroke-dasharray: 2 3; }
+.emblem.is-locked .disc { fill: none; stroke: var(--ink-2); stroke-width: 1.5; }
+.emblem.is-locked .glyph { color: var(--ink-2); }
+
+/* ---------- bottom tabs ---------- */
+.tabs { grid-row: 3; grid-column: 1; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); background: var(--bg); border-top: 2px solid var(--ink);
+  padding-left: var(--gutter-l); padding-right: var(--gutter-r); }
+.tabs button { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-height: 56px; padding: 6px 4px 5px; border: 0; background: transparent;
+  color: var(--ink-2); font-weight: 600; font-size: 12px; letter-spacing: .02em; cursor: pointer; outline-offset: -4px; }
+.tab-ico { width: 48px; height: 26px; border-radius: 999px; border: 2px solid transparent; display: grid; place-items: center; }
+.tab-ico svg { width: 18px; height: 18px; }
+.tabs button[aria-pressed="true"] { color: var(--ink); font-weight: 700; }
+.tabs button[aria-pressed="true"] .tab-ico { background: var(--eat); color: var(--on-eat); border-color: var(--ink); box-shadow: 0 2px 0 var(--shadow); }
+.tab-count { position: absolute; top: 2px; left: calc(50% + 12px); min-width: 20px; height: 20px; padding: 0 5px; border-radius: 999px; background: var(--walk); color: var(--on-walk); border: 2px solid var(--bg);
+  font-family: var(--font-mono); font-size: 11px; font-weight: 700; line-height: 16px; text-align: center; }
+
+/* ---------- badge earned ---------- */
+.modal { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; background: var(--scrim);
+  padding: 20px max(16px, env(safe-area-inset-right, 0px)) 20px max(16px, env(safe-area-inset-left, 0px)); }
+.modal-panel { width: min(100%, 360px); max-height: 100%; overflow-y: auto; background: var(--surface); border: 2px solid var(--ink); border-radius: 18px; box-shadow: 0 6px 0 var(--shadow);
+  padding: 20px 18px 16px; display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
+.modal-kicker { font-family: var(--font-mono); font-size: 12px; letter-spacing: .2em; text-transform: uppercase; color: var(--ink-2); }
+.award-list { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-direction: column; gap: 16px; align-items: center; }
+.award-list .emblem { width: 104px; height: 104px; margin: 0 auto 8px; }
+.award-list h2 { font-size: 24px; line-height: 1.1; font-weight: 700; text-wrap: balance; }
+.award-list .badge-blurb { font-size: 15px; }
+.modal-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(128px, 1fr)); gap: 8px; width: 100%; margin-top: 10px; }
+
+/* ---------- header buttons ---------- */
+.top-actions { display: flex; gap: 8px; flex: none; }
+.top-btn { width: 40px; height: 40px; border: 2px solid var(--ink); border-radius: 50%; background: var(--surface); display: grid; place-items: center; cursor: pointer; box-shadow: 0 2px 0 var(--shadow); }
+.top-btn svg { width: 18px; height: 18px; }
+.asof { display: block; font-size: 12px; color: var(--ink-2); }
+
+/* ---------- next stop ---------- */
+.nextup { border-top: 2px solid var(--ink); padding-top: 12px; display: flex; flex-direction: column; gap: 8px; max-width: 62ch; }
+.nextup-label { font-family: var(--font-mono); font-size: 11px; font-weight: 400; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-2); }
+.nextup-btn { display: grid; grid-template-columns: 34px minmax(0, 1fr) 14px; gap: 12px; align-items: center; width: 100%; min-height: 56px; padding: 8px 12px 8px 8px; text-align: left;
+  border: 2px solid var(--ink); border-radius: 12px; background: var(--surface); color: var(--ink); cursor: pointer; box-shadow: 0 2px 0 var(--shadow); }
+.nextup-btn svg { width: 14px; height: 14px; }
+.nextup-name { display: block; font-weight: 600; font-size: 16px; line-height: 1.2; }
+.nextup-dist { display: block; font-size: 13px; color: var(--ink-2); margin-top: 2px; }
+.nextup-done { font-size: 15px; }
+.nextup .btn { align-self: flex-start; }
+
+/* ---------- passport page: a keepsake sized to fit one screenshot on most phones ---------- */
+#view-passport { padding-block: 10px 12px; }
+.pp { max-width: 440px; margin: 0 auto; display: flex; flex-direction: column; gap: 8px; }
+.pp-kicker { font-family: var(--font-mono); font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--ink-2); text-align: center; }
+.pp-owner { display: flex; flex-direction: column; align-items: center; }
+.pp-owner label { font-family: var(--font-mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-2); }
+.pp-name { width: 100%; max-width: 320px; text-align: center; font-family: var(--font-sign); font-size: 30px; line-height: 1.15; color: var(--walk); background: transparent;
+  border: 0; border-bottom: 2px solid var(--ink); border-radius: 0; padding: 2px 4px 0; }
+.pp-name::placeholder { color: var(--ink-2); opacity: 1; font-size: 22px; }
+.slots { list-style: none; margin: 4px 0 0; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px 4px; }
+.slot { display: flex; flex-direction: column; align-items: center; gap: 3px; width: 100%; padding: 0; border: 0; background: transparent; color: var(--ink); cursor: pointer; container-type: inline-size; }
+.slot-disc { width: calc(100% - 4px); aspect-ratio: 1; border-radius: 50%; border: 1.5px dashed var(--ink-2); color: var(--ink-2); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
+.slot-no { font-family: var(--font-mono); font-weight: 700; font-size: 18px; line-height: 1; }
+.slot-date { font-family: var(--font-mono); font-size: 9px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; line-height: 1; }
+.slot-date:empty { display: none; }
+.slot-name { max-width: 100%; font-size: 10px; font-size: clamp(9px, 16cqi, 10.5px); font-weight: 600; line-height: 1.15; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.slot.is-inked .slot-disc { border: 2px solid var(--ink); background: var(--pin); color: var(--on-pin); box-shadow: inset 0 0 0 3px var(--pin), inset 0 0 0 4.5px var(--on-pin); transform: rotate(var(--tilt, 0deg)); }
+.pp-badges { display: flex; justify-content: center; gap: 4px; margin-top: 2px; }
+.pp-badges .emblem { flex: 1 1 0; min-width: 0; max-width: 34px; width: auto; height: auto; aspect-ratio: 1; }
+.pp-sum { text-align: center; font-family: var(--font-mono); font-size: 12px; font-weight: 700; }
+.pp-issued { text-align: center; font-size: 12px; color: var(--ink-2); }
+.pp-issued:empty { display: none; }
+.pp-actions { display: flex; flex-direction: column; align-items: center; gap: 6px; margin-top: 2px; }
+.pp-hint { font-size: 12px; color: var(--ink-2); text-align: center; }
+@media (max-width: 339px) { .slots { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+
+/* ---------- welcome, about, share ---------- */
+.modal-panel > h2, .page-head h2 { font-size: 24px; line-height: 1.1; font-weight: 700; text-wrap: balance; }
+.welcome-lede { font-size: 15px; color: var(--ink-2); }
+.welcome-steps { list-style: none; margin: 6px 0 2px; padding: 0; width: 100%; display: flex; flex-direction: column; gap: 10px; text-align: left; }
+.welcome-steps li { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 12px; align-items: center; font-size: 15px; line-height: 1.35; }
+.welcome-steps i { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--ink); display: grid; place-items: center; font-style: normal; font-family: var(--font-mono); font-weight: 700; font-size: 14px;
+  background: var(--eat); color: var(--on-eat); }
+.modal-panel.is-page { width: min(100%, 480px); align-items: stretch; text-align: left; gap: 14px; padding: 16px 18px 20px; }
+.page-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.about section { display: flex; flex-direction: column; gap: 6px; border-top: 1px dashed var(--line); padding-top: 12px; }
+.about h3 { font-family: var(--font-mono); font-size: 11px; font-weight: 400; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-2); }
+.about p, .about li { font-size: 15px; line-height: 1.45; }
+.about ol { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 4px; }
+.about .sources { margin: 0; padding-left: 18px; }
+.about .sources li { font-size: 13px; color: var(--ink-2); line-height: 1.35; }
+.about-foot { font-size: 12px; color: var(--ink-2); }
+.about-link { align-self: flex-start; padding: 0; }
+.share-lede { font-size: 15px; }
+.share-text { display: block; width: 100%; min-height: 96px; resize: none; overflow: hidden; font: inherit; font-size: 16px; line-height: 1.4; color: var(--ink); background: var(--bg); border: 2px solid var(--ink); border-radius: 12px; padding: 10px 12px; }
+.share-note { font-size: 13px; color: var(--ink-2); }
+
+/* ---------- street map pictures ---------- */
+#tiles { position: absolute; inset: 0; z-index: 0; isolation: isolate; overflow: hidden; overflow: clip; pointer-events: none; filter: var(--tile-filter); }      /* its own layer, so the pictures can never climb over the pins */
+#tiles img { position: absolute; left: 0; top: 0; max-width: none; display: block; user-select: none; -webkit-user-select: none; }
+.map-attrib { position: absolute; right: var(--gutter-r); bottom: 10px; white-space: nowrap; font-size: 10.5px; line-height: 1.2; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 2px 6px; text-decoration: underline; }      /* the map credit sits bottom right, always in view */
+@media (max-width: 339px) { .map-attrib { font-size: 9.5px; padding: 2px 4px; } }
+.map-zoom button[aria-pressed="true"] { background: var(--eat); color: var(--on-eat); }
+
+/* ---------- field tools ---------- */
+.field { border-top: 2px dashed var(--ink); padding-top: 12px; display: flex; flex-direction: column; gap: 6px; max-width: 62ch; }
+.field-line { font-size: 14px; line-height: 1.35; }
+.field-line.is-strong { font-weight: 600; }
+.field-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+.field-note, .field-out { display: block; width: 100%; font: inherit; font-size: 16px; line-height: 1.35; color: var(--ink); background: var(--bg); border: 2px solid var(--ink); border-radius: 10px; padding: 8px 10px; resize: vertical; }
+.field-out { font-family: var(--font-mono); font-size: 12px; }
+.about-small { font-size: 13px !important; color: var(--ink-2); }
+#field-box { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+#field-box .field-out { align-self: stretch; }
+
+/* ---------- phones: the card grows while you answer trivia ---------- */
+@media (max-width: 899px) {
+  .sheet.is-tall, .app[data-view="map"] .sheet.is-tall { max-height: 88%; }
+}
+/* ---------- small phones ---------- */
+@media (max-width: 359px) {
+  .sheet-head { gap: 8px; }
+  .sheet-kicker { font-size: 10px; letter-spacing: .06em; white-space: nowrap; }
+  .sheet-group { font-size: 13px; }
+  .stamp { width: 40px; height: 40px; font-size: 15px; }
+  .badge { grid-template-columns: 52px minmax(0, 1fr); gap: 4px 10px; padding: 10px; }
+  .badge .emblem { width: 52px; height: 52px; }
+}
+
+/* ---------- phones held sideways: slimmer header, tabs and card footer, so the story keeps some room ---------- */
+@media (max-height: 480px) and (max-width: 899px) {
+  .top { padding-block: 4px; }
+  .brand svg { width: 28px; height: 28px; }
+  .brand-word { font-size: 25px; }
+  .tabs button { flex-direction: row; gap: 6px; min-height: 44px; padding: 4px; }
+  .tab-ico { width: 38px; height: 24px; }
+  .tab-count { position: static; border-color: transparent; }
+  .sheet, .app[data-view="map"] .sheet { max-height: 88%; }
+  .sheet-head { padding-block: 6px; }
+  .checkin { flex-direction: row; align-items: center; gap: 12px; }
+  .checkin > * { flex: 1 1 0; min-width: 0; }
+}
+
+/* ---------- wide screens: the map stays, with the list or the badges beside it ---------- */
+@media (min-width: 900px) {
+  .stage { grid-template-columns: minmax(0, 1fr) 420px; }
+  #view-map, .app[data-view="map"] #view-stops { display: block; }
+  #view-stops, #view-badges, #view-passport { border-left: 2px solid var(--ink); padding-left: 20px; padding-right: var(--gutter-r); }
+  .sheet, .app[data-view="map"] .sheet { position: absolute; left: auto; right: 0; top: 0; bottom: 0; width: 420px; max-height: none; border-radius: 0; border-top: 0; border-left: 2px solid var(--ink); box-shadow: none; }
+  .sheet-head, .sheet-scroll, .sheet-foot { padding-left: 20px; }
+  .pin-tag { max-width: 320px; }
+  .tabs { grid-row: 1; justify-self: end; align-self: center; margin-right: calc(var(--gutter-r) + 104px); padding: 0; display: flex; border: 2px solid var(--ink); border-radius: 999px; overflow: hidden; z-index: 2; }
+  .tabs #seg-map, .tab-ico { display: none; }
+  .tabs button { flex-direction: row; gap: 8px; min-height: 38px; padding: 6px 16px; font-size: 14px; color: var(--ink); }
+  .tabs button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+  .tab-count { position: static; border-color: transparent; }
+  .toast { top: calc(env(safe-area-inset-top, 0px) + 122px); left: calc((100% - 420px) / 2); }      /* over the open map, clear of the header tabs */
+}
+@media (prefers-reduced-motion: no-preference) {
+  .sheet:not([hidden]) { animation: rise .22s ease-out; }
+  .stamp.just-stamped { animation: thunk .5s cubic-bezier(.2, 1.4, .4, 1); }
+  .modal:not([hidden]) .modal-panel { animation: rise .2s ease-out; }
+  .modal:not([hidden]) .award-list .emblem { animation: thunk .6s cubic-bezier(.2, 1.4, .4, 1) .08s backwards; }
+  .stamp.just-stamped::after { content: ""; position: absolute; inset: -6px; border-radius: 50%; border: 3px solid var(--eat); animation: ring .7s ease-out forwards; }
+  @keyframes thunk { 0% { transform: scale(1.7) rotate(-14deg); } 60% { transform: scale(.93) rotate(3deg); } 100% { transform: none; } }
+  @keyframes ring { from { transform: scale(.8); opacity: 1; } to { transform: scale(2.1); opacity: 0; } }
+  @keyframes rise { from { transform: translateY(18px); opacity: .6; } to { transform: none; opacity: 1; } }
+}
+</style>
+
+<div class="app" id="app" data-view="map">
+  <header class="top">
+    <div class="brand">
+      <svg viewBox="0 0 48 48" aria-hidden="true">
+        <g stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none">
+          <path d="M24 3v42M3 24h42M9 9l30 30M39 9L9 39"/>
+        </g>
+        <g fill="var(--eat)" stroke="currentColor" stroke-width="2">
+          <circle cx="24" cy="3.5" r="3"/><circle cx="24" cy="44.5" r="3"/><circle cx="3.5" cy="24" r="3"/><circle cx="44.5" cy="24" r="3"/>
+        </g>
+        <g fill="var(--wheels)" stroke="currentColor" stroke-width="2">
+          <circle cx="9.5" cy="9.5" r="2.5"/><circle cx="38.5" cy="38.5" r="2.5"/><circle cx="38.5" cy="9.5" r="2.5"/><circle cx="9.5" cy="38.5" r="2.5"/>
+        </g>
+        <circle cx="24" cy="24" r="7" fill="var(--walk)" stroke="currentColor" stroke-width="2"/>
+      </svg>
+      <h1 class="brand-text"><span class="brand-kicker">Tri-Cities</span><span class="brand-word">Passport</span></h1>
+    </div>
+    <div class="top-actions">
+      <button type="button" class="top-btn" id="btn-share" aria-label="Share"><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M9 11.5V2.5M5.8 5.4L9 2.2l3.2 3.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 8.5H3.5v7h11v-7H13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button type="button" class="top-btn" id="btn-about" aria-label="About and help"><svg viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="4.4" r="1.3" fill="currentColor"/><path d="M7.4 8H9v6.5M7 14.5h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+  </header>
+
+  <main class="stage">
+    <section class="view" id="view-map" aria-label="Map of Zone 1, Atomic Richland">
+      <div id="tiles" aria-hidden="true"></div>
+      <canvas id="map-canvas" aria-hidden="true"></canvas>
+      <div id="pins"></div>
+      <div class="map-chips" role="group" aria-label="Map views">
+        <button type="button" class="chip-btn" data-preset="downtown" aria-pressed="true">Downtown</button>
+        <button type="button" class="chip-btn" data-preset="uptown" aria-pressed="false">Uptown</button>
+        <button type="button" class="chip-btn" data-preset="parkway" aria-pressed="false">Parkway</button>
+        <button type="button" class="chip-btn" data-preset="all" aria-pressed="false">All</button>
+      </div>
+      <svg class="compass" viewBox="0 0 48 48" aria-hidden="true">
+        <circle cx="24" cy="27" r="15" fill="var(--surface)" stroke="var(--ink)" stroke-width="2"/>
+        <path d="M24 14l5 13h-10z" fill="var(--walk)" stroke="var(--ink)" stroke-width="1.5" stroke-linejoin="round"/>
+        <path d="M24 40l5-13h-10z" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.5" stroke-linejoin="round"/>
+        <text x="24" y="9" text-anchor="middle" font-family="Space Mono, monospace" font-weight="700" font-size="10" fill="var(--ink)">N</text>
+      </svg>
+      <div class="map-zoom">
+        <button type="button" id="zoom-in" aria-label="Zoom in"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button>
+        <button type="button" id="zoom-out" aria-label="Zoom out"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 8h12" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button>
+        <button type="button" id="find-me" aria-label="Show my location" hidden><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="4.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 0.8v3M8 12.2v3M0.8 8h3M12.2 8h3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+        <button type="button" id="map-style" aria-label="Switch to the drawn map" aria-pressed="false" hidden><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2l6 3.2-6 3.2-6-3.2zM2.6 8.2L8 11.1l5.4-2.9M2.6 10.9L8 13.8l5.4-2.9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></svg></button>
+      </div>
+      <div class="map-foot">
+        <div class="legend" aria-hidden="true">
+          <span><i style="background:var(--walk)"></i>Walk</span>
+          <span><i style="background:var(--eat)"></i>Eat and drink</span>
+          <span><i style="background:var(--wheels)"></i>Bike or car</span>
+          <span class="legend-progress" id="map-progress"></span>
+        </div>
+        <div class="scale-row">
+          <div class="scale"><span id="scale-label">500 ft</span><div class="scale-bar" id="scale-bar" style="width:80px"></div></div>
+          <span class="map-note" id="map-note">Drawn map. Streets are simplified.</span>
+        </div>
+      </div>
+      <a class="map-attrib" id="map-attrib" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener" hidden></a>
+    </section>
+
+    <section class="view" id="view-stops" aria-label="All stops"></section>
+
+    <section class="view" id="view-badges" aria-label="Badges"></section>
+
+    <section class="view" id="view-passport" aria-label="My passport"></section>
+
+    <aside class="sheet" id="card" hidden aria-labelledby="card-title">
+      <div class="sheet-head">
+        <span class="stamp" id="card-num"></span>
+        <span class="sheet-meta"><span class="sheet-kicker" id="card-kicker"></span><span class="sheet-group" id="card-group"></span></span>
+        <span class="visited-chip" id="card-visited" hidden>Visited</span>
+        <button type="button" class="icon-btn" id="card-close" aria-label="Close">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 2l12 12M14 2L2 14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div class="sheet-scroll" id="card-scroll">
+        <h2 id="card-title" tabindex="-1"></h2>
+        <p class="tagline" id="card-tagline"></p>
+        <div class="card-actions">
+          <a class="btn btn-sm" id="card-dir" target="_blank" rel="noopener">Directions</a>
+          <button type="button" class="btn btn-sm" id="card-show">Show on map</button>
+        </div>
+        <p class="quiet-note" id="card-quiet" hidden>A quiet stop. Please visit respectfully.</p>
+        <p class="story" id="card-story"></p>
+        <dl class="facts">
+          <div><dt>Look for</dt><dd id="card-look"></dd></div>
+          <div><dt>Tip</dt><dd id="card-tip"></dd></div>
+          <div><dt>Hours</dt><dd><span id="card-hours"></span><span class="asof" id="card-asof"></span></dd></div>
+          <div><dt>Where</dt><dd id="card-where"></dd></div>
+        </dl>
+        <section class="trivia" id="card-trivia" aria-label="Trivia"></section>
+        <section class="nextup" id="card-nextup" aria-label="Next stop" hidden></section>
+        <section class="field" id="card-field" aria-label="Field tools" hidden></section>
+        <p class="source" id="card-source"></p>
+      </div>
+      <div class="sheet-foot">
+        <button type="button" class="icon-btn" id="card-prev" aria-label="Previous stop">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 2L4 8l6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="checkin" id="checkin"></div>
+        <button type="button" class="icon-btn" id="card-next" aria-label="Next stop">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 2l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </aside>
+  </main>
+  <nav class="tabs" aria-label="Sections">
+    <button type="button" id="seg-map" aria-pressed="true"><span class="tab-ico"><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M9 16.2s5.2-4.7 5.2-8.7A5.2 5.2 0 0 0 3.8 7.5c0 4 5.2 8.7 5.2 8.7z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="9" cy="7.4" r="1.7" fill="currentColor"/></svg></span><span class="tab-label">Map</span></button>
+    <button type="button" id="seg-stops" aria-pressed="false"><span class="tab-ico"><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M7 4.5h8.5M7 9h8.5M7 13.5h8.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="3.2" cy="4.5" r="1.2" fill="currentColor"/><circle cx="3.2" cy="9" r="1.2" fill="currentColor"/><circle cx="3.2" cy="13.5" r="1.2" fill="currentColor"/></svg></span><span class="tab-label">Stops</span></button>
+    <button type="button" id="seg-badges" aria-pressed="false"><span class="tab-ico"><svg viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="6.8" r="4.4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M6.3 10.6L5 16.2l4-2.1 4 2.1-1.3-5.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></svg></span><span class="tab-label">Badges</span><span class="tab-count" id="tab-badge-count" hidden></span></button>
+    <button type="button" id="seg-passport" aria-pressed="false"><span class="tab-ico"><svg viewBox="0 0 18 18" aria-hidden="true"><rect x="3.5" y="2" width="11" height="14" rx="1.8" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="9" cy="7.6" r="2.4" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M6.5 12.8h5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span><span class="tab-label">Passport</span></button>
+  </nav>
+  <div class="modal" id="award" hidden>
+    <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="award-kicker">
+      <p class="modal-kicker" id="award-kicker">Badge earned</p>
+      <ul class="award-list" id="award-list"></ul>
+      <div class="modal-actions">
+        <button type="button" class="btn" id="award-see">See my badges</button>
+        <button type="button" class="btn btn-solid" id="award-close">Keep going</button>
+      </div>
+    </div>
+  </div>
+  <div class="modal" id="welcome" hidden>
+    <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="welcome-title">
+      <p class="modal-kicker" id="welcome-kicker"></p>
+      <h2 id="welcome-title">Welcome to your passport</h2>
+      <p class="welcome-lede" id="welcome-lede"></p>
+      <ol class="welcome-steps">
+        <li><i aria-hidden="true">1</i><span>Pick a stop on the map and go there. Each one has a short story to read on the spot.</span></li>
+        <li><i aria-hidden="true">2</i><span>Check in when you arrive to stamp your passport.</span></li>
+        <li><i aria-hidden="true">3</i><span>Answer the stop's trivia question, and collect badges as the stamps add up.</span></li>
+      </ol>
+      <div class="modal-actions">
+        <button type="button" class="btn" id="welcome-more">How it works</button>
+        <button type="button" class="btn btn-solid" id="welcome-go">Start exploring</button>
+      </div>
+    </div>
+  </div>
+  <div class="modal" id="about" hidden>
+    <div class="modal-panel is-page about" role="dialog" aria-modal="true" aria-labelledby="about-title">
+      <div class="page-head">
+        <h2 id="about-title">About this passport</h2>
+        <button type="button" class="icon-btn" id="about-close" aria-label="Close"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 2l12 12M14 2L2 14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
+      </div>
+      <section>
+        <h3>How it works</h3>
+        <ol>
+          <li>Pick a stop on the map or in the list, and go there.</li>
+          <li>Check in when you arrive. That stamps your passport.</li>
+          <li>Answer the stop's trivia question. Miss it and a fresh one comes up, so nobody gets stuck.</li>
+          <li>Badges arrive as the stamps and right answers add up.</li>
+        </ol>
+        <button type="button" class="link-btn about-link" id="about-welcome">Show the welcome card again</button>
+      </section>
+      <section>
+        <h3>Your privacy</h3>
+        <p>Your location is read only at the moment you tap Check in or Find me. The app records that you checked in and when. It does not keep your position or send it anywhere.</p>
+        <p>Your name, stamps, answers and badges are saved in this browser, on this phone only. They do not follow you to another phone, and clearing your browser data erases them. The Directions button opens Google Maps, which has its own terms. The typefaces are loaded from Google and, where the street map shows, its pictures are loaded from OpenStreetMap, the way any web page loads fonts and pictures.</p>
+      </section>
+      <section>
+        <h3>The stories</h3>
+        <p id="about-facts"></p>
+        <ul class="sources" id="about-sources"></ul>
+      </section>
+      <section>
+        <h3>The map</h3>
+        <p id="about-map"></p>
+      </section>
+      <section>
+        <h3>Start over</h3>
+        <div class="reset-row" id="reset-row"></div>
+      </section>
+      <section>
+        <h3>For the tour builder</h3>
+        <p>Field tools add a panel to every stop for capturing its true position by GPS and jotting a note. They are meant for whoever maintains the tour, on site.</p>
+        <div id="field-box"></div>
+      </section>
+      <p class="about-foot" id="about-foot"></p>
+    </div>
+  </div>
+  <div class="modal" id="share" hidden>
+    <div class="modal-panel is-page" role="dialog" aria-modal="true" aria-labelledby="share-title">
+      <div class="page-head">
+        <h2 id="share-title">Share with friends or family</h2>
+        <button type="button" class="icon-btn" id="share-close" aria-label="Close"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 2l12 12M14 2L2 14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
+      </div>
+      <p class="share-lede">Here is a message to send. It keeps up with your stamps and badges.</p>
+      <textarea class="share-text" id="share-text" readonly rows="5" aria-label="Message to share"></textarea>
+      <p class="share-note" id="share-note" hidden>This preview has no public link yet, so the message goes without one.</p>
+      <div class="modal-actions">
+        <button type="button" class="btn" id="share-copy">Copy message</button>
+        <button type="button" class="btn btn-solid" id="share-send">Share</button>
+      </div>
+    </div>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+</div>
+
+<script type="application/json" id="passport-data">{"app":{"name":"Tri-Cities Passport","dataVersion":5,"factsChecked":"2026-11-23","zone":"Zone 1: Atomic Richland","trivia":{"unlock":"checkin","retry":"rotate"},"shareUrl":"","map":{"tiles":"https://tile.openstreetmap.org/{z}/{x}/{y}.png","maxZoom":19,"attribution":"© OpenStreetMap contributors","attributionUrl":"https://www.openstreetmap.org/copyright"}},"groups":[{"id":"walk","name":"Downtown walk","blurb":"Ten stops on foot, from Uptown to the river."},{"id":"eat","name":"Eat and drink","blurb":"Five long-running Richland tables. Optional, and worth it."},{"id":"wheels","name":"Bike or car","blurb":"Six stops spread along the river and the edge of Hanford."}],"stops":[{"id":"spudnut","name":"Spudnut Shop","group":"walk","order":1,"lat":46.286469,"lng":-119.275657,"radiusM":60,"coordSource":"map lookup","address":"228 Williams Blvd, Richland","quiet":false,"tagline":"A $50 deal and a lot of flour","story":"Everything behind this counter traces back to a $50 deal. In 1948 Barlow Ghirardo and Jerry Bell bought their franchise for fifty dollars and 100 sacks of flour, and Richland has been lining up here ever since. The trick is potato flour, an idea two Salt Lake City brothers hit on in 1940. The shop first opened down at the Richland Wye. When Uptown was built, it moved in and never left.","lookFor":"The counter full of regulars, some of whom have been coming for decades.","tip":"Go early. Favorites sell out well before closing.","hours":"Opens 4 a.m. most days, 6 a.m. Sunday. Closes by 2 p.m.","trivia":[{"q":"What did the founders pay for their Spudnut franchise in 1948?","options":["$50 and 100 sacks of flour","$500 and a delivery truck","$5,000 in war bonds"],"answer":0,"explain":"Fifty dollars and 100 sacks of flour bought the franchise."},{"q":"What is the special ingredient in a Spudnut?","options":["Potato flour","Rice flour","Cornmeal"],"answer":0,"explain":"Potato flour, an idea two Salt Lake City brothers hit on in 1940."},{"q":"Where did the Spudnut Shop first open, before it moved to Uptown?","options":["The Richland Wye","The Parkway","Downtown Pasco"],"answer":0,"explain":"It opened at the Richland Wye and moved in when Uptown was built."}],"sources":["ColumbiaBasinTalk, oldest restaurants feature (May 2025)"],"short":"Spudnut"},{"id":"alley","name":"Uptown Alley Gallery and the Bronze Grizzly","group":"walk","order":2,"lat":46.286629,"lng":-119.2763563,"radiusM":60,"coordSource":"map lookup (Uptown Theatre)","address":"Uptown Theatre, 1300 Jadwin Ave, and the alleys behind Uptown","quiet":false,"tagline":"A bear out front, wings out back","story":"Start with the bear. The bronze grizzly outside the Uptown Theatre stands 12 feet tall, one of several oddball statues that developer Warren Luke scattered around the Tri-Cities before he died in 2020. Then slip around back. The service alleys behind these shops are turning into an outdoor gallery, where local artists have painted angel wings, dragons, elephants and hearts sized for you to step in front of.","lookFor":"The grizzly by the theater doors, then the painted wings in the alley.","tip":"The alleys are working service lanes. Watch for delivery trucks.","hours":"Outdoors, any time. Best in daylight.","trivia":[{"q":"How tall is the bronze grizzly outside the Uptown Theatre?","options":["12 feet","6 feet","20 feet"],"answer":0,"explain":"The bear stands 12 feet tall."},{"q":"Who placed the bronze grizzly and other odd statues around the Tri-Cities?","options":["Developer Warren Luke","The city parks department","A Hollywood film crew"],"answer":0,"explain":"Warren Luke scattered several oddball statues around the area before he died in 2020."},{"q":"Where is Uptown's outdoor gallery of murals?","options":["In the service alleys behind the shops","On the theater roof","Inside a parking garage"],"answer":0,"explain":"Local artists are turning the service alleys into an outdoor gallery."}],"sources":["Tri-City Herald, roadside curiosities"],"short":"Alley Art"},{"id":"uptown","name":"Uptown Shopping Center","group":"walk","order":3,"lat":46.2873508,"lng":-119.2758342,"radiusM":80,"coordSource":"map lookup","address":"1317 George Washington Way, Richland","quiet":false,"tagline":"Built for the automobile, 1949","story":"Notice how the whole place is arranged around the parking lot. In 1949 that was the new idea. The National Park Service calls Uptown one of the first shopping malls in the country designed around the car. Until it opened, Richland families often drove to Pasco or Walla Walla to shop. The Cold War had just made this government town permanent, and the stores around you were the proof.","lookFor":"Atomic-age styling on the signs and walls, and the murals in the central atrium.","tip":"Shops keep their own hours. Many open around 11 a.m.","hours":"Most shops 11 a.m. to 7 p.m.","trivia":[{"q":"What made Uptown unusual when it opened in 1949?","options":["It was designed around the car","It was built underground","Only Hanford employees could shop there"],"answer":0,"explain":"It was among the first shopping centers in the country planned for drivers."},{"q":"In what year did the Uptown Shopping Center open?","options":["1949","1939","1962"],"answer":0,"explain":"1949, just as the Cold War made this government town permanent."},{"q":"Before Uptown opened, where did Richland families often drive to shop?","options":["Pasco or Walla Walla","Seattle or Tacoma","Portland or Boise"],"answer":0,"explain":"Shopping often meant a drive to Pasco or Walla Walla."}],"sources":["NPS, Uptown Shopping Center"],"short":"Uptown"},{"id":"adventures","name":"Adventures Underground","group":"walk","order":4,"lat":46.2893194,"lng":-119.275575,"radiusM":60,"coordSource":"map lookup","address":"1391 George Washington Way, Richland","quiet":false,"tagline":"One door, five shops","story":"From the sidewalk this looks like one bookstore. Keep going once you are inside. Past the first shelves you will find a deep comics section, tabletop games and model kits, a room of vinyl records and a cafe. It is the kind of place where a quick look turns into an hour, which is no bad thing on a hot Richland afternoon.","lookFor":"The records room, tucked toward the back.","tip":"Good shade and air conditioning on a hot day.","hours":"Tue to Sun 10 a.m. to 7 p.m. Closed Monday.","trivia":[{"q":"Adventures Underground is several shops in one. Which of these is NOT inside?","options":["A bowling alley","A records room","A game store"],"answer":0,"explain":"Books, comics, games, records and a cafe, but no bowling."},{"q":"What is tucked toward the back of Adventures Underground?","options":["A room of vinyl records","A movie screen","A barber shop"],"answer":0,"explain":"The records room is toward the back, past the comics and games."},{"q":"By this card's count, how many kinds of shop share this one door?","options":["Five","Two","Twelve"],"answer":0,"explain":"Books, comics, games and models, records, and a cafe."}],"sources":["Visitor descriptions and v3 planner"],"short":"Adventures"},{"id":"johndam","name":"John Dam Plaza","group":"walk","order":5,"lat":46.2775032,"lng":-119.2745066,"radiusM":100,"coordSource":"map lookup","address":"815 George Washington Way, Richland","quiet":false,"tagline":"From 247 people to 25,000","story":"In 1940 the town around you had 247 people. Then, on March 6, 1943, a federal court ordered more than 300 residents of the area out of their homes, for a government project nobody would explain. By August 1945 about 25,000 people lived here, and this lawn was the front yard of an instant city. The name is the one thing older than all of it. Richland dates to 1905 and honors Nelson Rich, a legislator and land developer.","lookFor":"The stage and lawn that host summer concerts and the winter light show.","tip":"A good place to sit and set the scene before the walk south.","hours":"Open 5 a.m. to 11 p.m.","trivia":[{"q":"About how many people lived in Richland in 1940, before the Army arrived?","options":["247","2,470","24,700"],"answer":0,"explain":"Just 247. Five years later the town held about 25,000."},{"q":"On what date did a federal court order the area's residents out of their homes?","options":["March 6, 1943","December 7, 1941","August 6, 1945"],"answer":0,"explain":"March 6, 1943. More than 300 residents had to leave."},{"q":"Who is Richland named for?","options":["Nelson Rich, a legislator and land developer","The rich soil along the Columbia","Richmond, Virginia"],"answer":0,"explain":"The name dates to 1905 and honors Nelson Rich."}],"sources":["Wikipedia, Richland, Washington"],"short":"John Dam"},{"id":"parkway","name":"The Parkway","group":"walk","order":6,"lat":46.2754663,"lng":-119.2741709,"radiusM":120,"coordSource":"map lookup (710 The Parkway)","address":"The Parkway, downtown Richland","quiet":false,"tagline":"Main street of a secret city","story":"Walk this street the way a Hanford family did in 1944. Planners called it the Greenway and built it so you could shop, borrow a library book and catch a movie without ever needing a car. Some of those buildings are still around you, working under new names. Roma House was CC Anderson's Department Store. The bakery Frost Me Sweet was Gress's Meat Market.","lookFor":"Frost Me Sweet at 710 The Parkway, the former meat market.","tip":"Shaded seating makes this the best rest stop on the walk.","hours":"Street open any time. Shops vary.","trivia":[{"q":"What was the bakery Frost Me Sweet during the Manhattan Project?","options":["Gress's Meat Market","The town post office","An Army canteen"],"answer":0,"explain":"It was Gress's Meat Market, one of the Parkway's original shops."},{"q":"What did planners call the Parkway when they laid it out?","options":["The Greenway","Atomic Avenue","Riverside Row"],"answer":0,"explain":"It was planned as the Greenway, a place to shop without needing a car."},{"q":"What was Roma House during the Manhattan Project?","options":["CC Anderson's Department Store","The town jail","A bus depot"],"answer":0,"explain":"Roma House was CC Anderson's Department Store."}],"sources":["NPS, The Parkway"],"short":"Parkway"},{"id":"laundry","name":"Wartime Laundry and Alphabet Homes","group":"walk","order":7,"lat":46.2738759,"lng":-119.2786386,"radiusM":120,"coordSource":"map lookup (1106 Harding St)","address":"1106 Harding St, Richland","quiet":false,"tagline":"Ten days to get your shirts back","story":"The laundry in front of you looks much as it did during the Manhattan Project, and in 1944 it was overwhelmed. Richland had jumped from about 250 people to 15,000, and the best the laundry could promise was your clothes back in ten to twelve days. It stood a short walk from the alphabet homes, the letter-coded houses that architect Gustav Albin Pehrson designed for the new town. The government owned every one. Tenants could not even pick their own paint.","lookFor":"On the residential streets nearby, matching rooflines that repeat down the block.","tip":"The laundry is a working business and the homes are private. View from the sidewalk.","hours":"Exterior, any time.","trivia":[{"q":"In 1944, how long did Richland's laundry say you might wait for clean clothes?","options":["Ten to twelve days","Two days","Same day"],"answer":0,"explain":"The town had outgrown it. Ten to twelve days was the best it could promise."},{"q":"Who designed Richland's letter-coded alphabet homes?","options":["Architect Gustav Albin Pehrson","General Leslie Groves","Frank Lloyd Wright"],"answer":0,"explain":"Gustav Albin Pehrson designed the houses for the new town."},{"q":"During the war, who owned the alphabet homes?","options":["The government owned every one","Each family that lived in one","A Seattle real estate company"],"answer":0,"explain":"The government owned them all. Tenants could not even pick their own paint."}],"sources":["NPS, Richland Laundry and Alphabet Homes; NPS, Rodney Block Park"],"short":"Laundry"},{"id":"players","name":"Richland Players Theater","group":"walk","order":8,"lat":46.2736294,"lng":-119.2742948,"radiusM":60,"coordSource":"map lookup","address":"608 The Parkway, Richland","quiet":false,"tagline":"Movie night in a secret city","story":"In April 1944 this theater was showing 'Lifeboat', 'Princess O'Rourke' and 'The Lodger' to an audience sworn to secrecy about its work. The building in front of you went up that year as the town's movie house. That same year, project workers and their families formed the Richland Players to put on shows of their own. Eight decades later the company is still on this stage.","lookFor":"The marquee. Check what is playing this month.","tip":"Exterior stop unless you have tickets.","hours":"Box office Mon to Fri, noon to 6 p.m.","trivia":[{"q":"Which Alfred Hitchcock film played here in April 1944?","options":["Lifeboat","Psycho","Vertigo"],"answer":0,"explain":"'Lifeboat' was new in 1944. The other two came years later."},{"q":"In what year did project workers form the Richland Players?","options":["1944","1954","1974"],"answer":0,"explain":"1944, the same year this theater was built."},{"q":"What was this building built to be?","options":["The town's movie house","An Army mess hall","A bus garage"],"answer":0,"explain":"It went up in 1944 as the town's movie house."}],"sources":["NPS, Richland Players Theater"],"short":"Players"},{"id":"dyer","name":"Dyer Building (Gallery at the Park)","group":"walk","order":9,"lat":46.274649,"lng":-119.2725732,"radiusM":60,"coordSource":"map lookup","address":"89 Lee Blvd, Richland","quiet":false,"tagline":"The building the Army left standing","story":"You are looking at a survivor. Few buildings from the old farm village made it past 1943, and this one, built in 1909, has had more lives than most. It has been a boarding house, a hotel, a family home, a newspaper office and Richland's first library. Step inside and it is an art gallery, run by Allied Arts, a group that grew out of art classes held for Manhattan Project families.","lookFor":"The gallery shop, which sells work by local artists.","tip":"Free to enter when open.","hours":"Tue to Thu noon to 4, Fri and Sat 10 to 5, Sun 1 to 5. Closed Monday.","trivia":[{"q":"Which of these has the Dyer Building never been?","options":["A fire station","A hotel","Richland's first library"],"answer":0,"explain":"Boarding house, hotel, home, newspaper office, library and gallery, but never a fire station."},{"q":"In what year was the Dyer Building built?","options":["1909","1929","1943"],"answer":0,"explain":"1909. Few buildings from the old farm village made it past 1943."},{"q":"Who runs the art gallery inside the Dyer Building?","options":["Allied Arts","The National Park Service","Richland High School"],"answer":0,"explain":"Allied Arts grew out of art classes held for Manhattan Project families."}],"sources":["NPS, Dyer Building (Gallery in the Park)"],"short":"Dyer Bldg"},{"id":"howardamon","name":"Howard Amon Park","group":"walk","order":10,"lat":46.2735665,"lng":-119.270389,"radiusM":200,"coordSource":"map lookup","address":"500 Amon Park Dr, Richland","quiet":false,"tagline":"The sturgeon that needed horses","story":"The river in front of you once gave up a sturgeon so big that it took a team of horses to drag it ashore. That was 1920, just below this park, and the Sturgeon Cove playground is named for the catch. The park honors Howard Amon, who with his father bought 2,300 acres here in 1904 and 1905 and laid out a town. The ground you are standing on is older than the atomic city that grew up around it.","lookFor":"The paved riverfront trail. It runs north to Leslie Groves Park and links to the Sacagawea Heritage Trail.","tip":"Finish here near sunset for the best light on the Columbia.","hours":"Open 5 a.m. to 11 p.m.","trivia":[{"q":"What did it take to haul the giant 1920 sturgeon out of the river?","options":["A team of horses","A tugboat","A dozen fishermen"],"answer":0,"explain":"A team of horses dragged it ashore."},{"q":"How many acres did Howard Amon and his father buy here in 1904 and 1905?","options":["2,300 acres","23 acres","230,000 acres"],"answer":0,"explain":"They bought 2,300 acres and laid out a town."},{"q":"Follow the paved riverfront trail north from here. Where does it lead?","options":["Leslie Groves Park","B Reactor","Downtown Pasco"],"answer":0,"explain":"The trail runs north along the Columbia to Leslie Groves Park."}],"sources":["Wikipedia, Richland and Howard Amon Park; v3 planner"],"short":"Amon Park"},{"id":"emerald","name":"Emerald of Siam","group":"eat","order":11,"lat":46.2870279,"lng":-119.2765293,"radiusM":50,"coordSource":"map lookup","address":"1314 Jadwin Ave, Richland","quiet":false,"tagline":"The first Thai kitchen in town","story":"In 1983 nobody in the Tri-Cities was serving Thai food. Ravadi Quinn changed that in this room, which until then had been a drugstore with a soda fountain. Her children Dara and Billy run the Emerald now, and they have turned the lounge into one of the busiest small stages in the region. Come back after dark and there is a good chance someone is playing.","lookFor":"The stage in the lounge.","tip":"Check the calendar. Some shows are ticketed.","hours":"Lunch and dinner Mon to Sat, late on weekends. Closed Sunday.","trivia":[{"q":"What filled this space before the Emerald opened in 1983?","options":["A drugstore and soda fountain","A bank","A shoe store"],"answer":0,"explain":"An Uptown drugstore with a soda fountain."},{"q":"Who opened the Emerald of Siam in 1983?","options":["Ravadi Quinn","Raymond Chin","Warren Luke"],"answer":0,"explain":"Ravadi Quinn opened it. Her children Dara and Billy run it now."},{"q":"What did the Emerald bring to the Tri-Cities for the first time?","options":["Thai food","Sushi","Karaoke"],"answer":0,"explain":"In 1983 nobody else in the Tri-Cities was serving Thai food."}],"sources":["Tri-Cities Area Journal of Business, Emerald of Siam at 40"],"short":"Emerald"},{"id":"lees","name":"Lee's Tahitian","group":"eat","order":12,"lat":46.2877896,"lng":-119.2762813,"radiusM":50,"coordSource":"map lookup","address":"1342 Jadwin Ave, Richland","quiet":false,"tagline":"The last glow of the tiki years","story":"Look up at the neon sign. It is the last glow of the tiki years, when this room had bamboo booths and neon palm trees. The place opened in 1950 as a plain diner called The Mixer, went Polynesian by 1952 and took the name Lee's in 1976. These days it is a late-night karaoke bar, and the sign is the star. It looks best after dark.","lookFor":"The neon sign, one of the last of its era in Richland.","tip":"A photo stop for most visitors. Best after dark, when the sign is lit.","hours":"Daily from late morning until 2 a.m.","trivia":[{"q":"What was this place called when it opened in 1950?","options":["The Mixer","The Atom","Trader Lee's"],"answer":0,"explain":"It began as a simple diner called The Mixer."},{"q":"By what year had this plain diner gone Polynesian?","options":["1952","1976","1995"],"answer":0,"explain":"It went Polynesian by 1952 and took the name Lee's in 1976."},{"q":"What is Lee's Tahitian these days?","options":["A late-night karaoke bar","A doughnut shop","A tiki museum"],"answer":0,"explain":"It is a late-night karaoke bar, and the neon sign is the star."}],"sources":["ColumbiaBasinTalk, oldest restaurants feature (May 2025)"],"short":"Lee's"},{"id":"rays","name":"Ray's Golden Lion","group":"eat","order":13,"lat":46.2882285,"lng":-119.2755876,"radiusM":50,"coordSource":"map lookup","address":"1353 George Washington Way, Richland","quiet":false,"tagline":"A small stage, a tall guest list","story":"The stage behind this door is small, and the names reported to have played it are hard to believe: Frank Sinatra Jr., Tina Turner, Meat Loaf. Raymond Chin opened the Golden Lion in 1963 as Eastern Washington's first Mongolian and Chinese restaurant, and after dinner it became a nightclub. It went dark in 2015. In 2023 new owners brought it back as a music venue, with burgers in place of the old Chinese menu.","lookFor":"Show posters by the door.","tip":"Evenings only. Check the show calendar before you go.","hours":"Tue to Sat evenings. Closed Sunday and Monday.","trivia":[{"q":"In what year did Ray's Golden Lion first open?","options":["1963","1949","1983"],"answer":0,"explain":"1963. It closed in 2015 and came back in 2023."},{"q":"Which of these names is on the list of acts reported to have played here?","options":["Tina Turner","Elvis Presley","The Beatles"],"answer":0,"explain":"The reported list includes Frank Sinatra Jr., Tina Turner and Meat Loaf."},{"q":"What kind of restaurant was the Golden Lion when Raymond Chin opened it?","options":["Mongolian and Chinese","Italian","Thai"],"answer":0,"explain":"It opened as Eastern Washington's first Mongolian and Chinese restaurant."}],"sources":["ColumbiaBasinTalk, oldest restaurants feature (May 2025)"],"short":"Ray's"},{"id":"atomicale","name":"Atomic Ale Brewpub","group":"eat","order":14,"lat":46.274558,"lng":-119.2773655,"radiusM":50,"coordSource":"map lookup","address":"1015 Lee Blvd, Richland","quiet":false,"tagline":"The Tri-Cities' first brewpub","story":"You are at the first brewpub the Tri-Cities ever had. Atomic Ale opened in 1997, brewing its own ales and baking pizza in a wood-fired oven, and it took its name and its decor straight from the city's atomic past. With the Parkway a block away, it makes a natural lunch stop on this walk.","lookFor":"Local history on the walls.","tip":"One block from the Parkway. Pizzas come in a small size for one.","hours":"Daily from 11 a.m.","trivia":[{"q":"Which local first does Atomic Ale claim?","options":["First brewpub in the Tri-Cities","First pizzeria in Washington","First restaurant in Richland"],"answer":0,"explain":"It was the area's first brewpub, opened in 1997."},{"q":"In what year did Atomic Ale open?","options":["1997","1977","2017"],"answer":0,"explain":"1997. It took its name and its decor from the city's atomic past."},{"q":"How does Atomic Ale bake its pizza?","options":["In a wood-fired oven","On a gas grill","In a deep fryer"],"answer":0,"explain":"The pizzas come out of a wood-fired oven."}],"sources":["atomicalebrewpub.com"],"short":"Atomic Ale"},{"id":"monterossos","name":"Monterosso's Italian Restaurant","group":"eat","order":15,"lat":46.2755131,"lng":-119.2773797,"radiusM":50,"coordSource":"map lookup","address":"1026 Lee Blvd, Richland","quiet":false,"tagline":"Dinner in a railroad car","story":"That is a real railroad dining car in front of you, and most nights people are eating dinner in it. Monterosso's has served Italian food aboard this car since 1995. It is as narrow inside as you would expect, so there are only a handful of tables, and a meal here feels like going somewhere.","lookFor":"The railcar itself, across Lee Boulevard from Atomic Ale.","tip":"Reserve ahead. Dinner only, closed Sunday.","hours":"Dinner Mon to Sat from 4 p.m.","trivia":[{"q":"What kind of building is Monterosso's?","options":["A railroad dining car","A converted alphabet house","A riverboat"],"answer":0,"explain":"An antique rail dining car, in service as a restaurant since 1995."},{"q":"Since what year has Monterosso's served dinner aboard this car?","options":["1995","1955","2015"],"answer":0,"explain":"Since 1995."},{"q":"Why does Monterosso's have only a handful of tables?","options":["A dining car is narrow inside","It opens only once a month","Half the car is a museum"],"answer":0,"explain":"It is as narrow inside as you would expect a railroad car to be."}],"sources":["Visit Tri-Cities directory"],"short":"Monterosso"},{"id":"rhs","name":"Richland High School, Home of the Bombers","group":"wheels","order":16,"lat":46.2783685,"lng":-119.2879595,"radiusM":200,"coordSource":"map lookup","address":"930 Long Ave, Richland","quiet":false,"tagline":"A mushroom cloud for a mascot","story":"Find the school emblem on the signs. That is a mushroom cloud. Richland's teams are the Bombers, and the name reaches back to 1944, when Hanford workers each gave up a day's wages to buy the Army a B-17. They named the plane 'Day's Pay'. Whether the Bombers honor that airplane, the bomb, or both is something people in this town still argue about.","lookFor":"The mushroom-cloud R on signs and the gym.","tip":"This is an active school. View it from the public sidewalk only.","hours":"Exterior, any time.","trivia":[{"q":"What was 'Day's Pay'?","options":["A B-17 bomber bought by Hanford workers","Hanford's weekly newspaper","A payroll train from Seattle"],"answer":0,"explain":"Workers each donated one day's pay in 1944 to buy the bomber."},{"q":"What shape is the Richland High School emblem?","options":["A mushroom cloud","A rocket","A lightning bolt"],"answer":0,"explain":"Look for the mushroom-cloud R on the signs and the gym."},{"q":"How did Hanford workers pay for the bomber 'Day's Pay' in 1944?","options":["Each gave up a day's wages","They held a town raffle","The school sold yearbooks"],"answer":0,"explain":"Each worker gave a day's wages, which is how the plane got its name."}],"sources":["v2 fact-check of the Day's Pay bomber"],"short":"Bombers"},{"id":"resthaven","name":"Resthaven Cemetery","group":"wheels","order":17,"lat":46.2865162,"lng":-119.2808409,"radiusM":150,"coordSource":"map lookup","address":"Williams Blvd at Goethals Dr, Richland","quiet":true,"tagline":"Richland's oldest cemetery, and 115 strangers","story":"The ground around you is the oldest cemetery in Richland, founded by the Odd Fellows in 1909 and one of the few institutions that came through the 1943 takeover. Buried among the early settlers are 115 Oregon prison inmates who died before the first atomic test in 1945. Scientists studied their remains as a baseline for what the nuclear age added to the human body. After 39 years in a laboratory, each was laid to rest here in 2004 with his own headstone.","lookFor":"The 2004 headstones, set together.","tip":"A place of rest. Visit quietly and stay on the paths.","hours":"Daylight. Office open weekdays.","trivia":[{"q":"Who founded Resthaven Cemetery in 1909?","options":["The Odd Fellows lodge","The U.S. Army","The DuPont company"],"answer":0,"explain":"The local Odd Fellows lodge, soon after Richland itself was founded."},{"q":"In what year were the 115 men laid to rest here, each with his own headstone?","options":["2004","1945","1965"],"answer":0,"explain":"2004, after 39 years in a laboratory."},{"q":"Why did scientists study the remains of the 115 men?","options":["As a baseline from before the atomic age","To search for missing soldiers","To study an old epidemic"],"answer":0,"explain":"They died before the first atomic test in 1945, so they showed what came after."}],"sources":["NPS, Resthaven Cemetery"],"short":"Resthaven"},{"id":"goldcoast","name":"Gold Coast Historic District","group":"wheels","order":18,"lat":46.2999924,"lng":-119.2681554,"radiusM":250,"coordSource":"map lookup (district listing, 1823 Hunt Ave)","address":"Around Hunt Ave and Davison Ave, between George Washington Way and the river","quiet":false,"tagline":"Where the bigger houses went","story":"Compare the houses around you with the duplexes closer to downtown. These are bigger, and that was the point. When the Soviet Union tested its first atomic bomb in 1949, Hanford expanded and Richland needed homes for more professionals. The larger, costlier houses went up here, close to the river, and by 1952 the neighborhood had its nickname. Even on the Gold Coast, everyone still rented from the government.","lookFor":"How much larger these homes are than the duplexes closer to downtown.","tip":"These are private homes. Stay on the sidewalk and keep voices low.","hours":"Public streets, any time.","trivia":[{"q":"How did the Gold Coast get its name?","options":["Bigger homes for higher-paid families, near the river","Gold was once panned on this shore","Every house was painted yellow"],"answer":0,"explain":"It was the upscale end of a government town, close to the Columbia."},{"q":"What 1949 event led Hanford to expand and Richland to build these homes?","options":["The Soviet Union's first atomic bomb test","The end of World War II","The launch of Sputnik"],"answer":0,"explain":"The Soviet test set off a Cold War expansion at Hanford."},{"q":"Even on the Gold Coast, how did families get their homes?","options":["They rented from the government","They bought them at auction","They built their own"],"answer":0,"explain":"Even here, everyone still rented from the government."}],"sources":["NPS and Wikipedia, Gold Coast Historic District"],"short":"Gold Coast"},{"id":"lesliegroves","name":"Leslie Groves Park","group":"wheels","order":19,"lat":46.3079582,"lng":-119.263823,"radiusM":300,"coordSource":"map lookup","address":"40 Park St, Richland","quiet":false,"tagline":"Named for the general in charge","story":"This stretch of river carries the name of the man who ran the whole thing. Gen. Leslie Groves, an Army engineer, directed the Manhattan Project, including the reactors upriver from here. The paved trail under your feet follows the Columbia south to Howard Amon Park. In winter, look out toward Nelson Island, where unusual gulls and diving ducks gather and local birders come to find them.","lookFor":"Nelson Island, just offshore.","tip":"Easy to reach by bike on the riverfront trail from Howard Amon Park.","hours":"Open 5 a.m. to 11 p.m.","trivia":[{"q":"Who was Leslie Groves?","options":["The general who directed the Manhattan Project","Richland's first mayor","The architect of the alphabet houses"],"answer":0,"explain":"Groves ran the entire Manhattan Project for the Army."},{"q":"Follow the paved trail south along the river. Where does it lead?","options":["Howard Amon Park","B Reactor","The Port of Benton"],"answer":0,"explain":"The trail follows the Columbia south to Howard Amon Park."},{"q":"What is the island just offshore from this park called?","options":["Nelson Island","Bateman Island","Clover Island"],"answer":0,"explain":"Nelson Island. In winter, birders watch it for unusual gulls and diving ducks."}],"sources":["Lower Columbia Basin Audubon; v3 planner"],"short":"Groves Park"},{"id":"visitorcenter","name":"Manhattan Project Visitor Center","group":"wheels","order":20,"lat":46.3186361,"lng":-119.3005801,"radiusM":100,"coordSource":"map lookup","address":"2000 Logston Blvd, Richland","quiet":false,"tagline":"As close as you can get to B Reactor","story":"Out past the fence stands B Reactor, the first full-scale nuclear reactor ever built. It made the plutonium for the Trinity test and for the bomb dropped on Nagasaki. Tours of the reactor are paused through the 2028 season, so for now this room is as close as you can get. The exhibits and a short film tell the story, and in 2026 free bus tours left from this door for the farm towns that were emptied to make room for it all.","lookFor":"The exhibit on the towns that were cleared in 1943.","tip":"Free. Ask the rangers about next season's tour dates.","hours":"Mon to Fri 9 to 4 in the off season. Longer hours in tour season.","trivia":[{"q":"What was B Reactor?","options":["The world's first full-scale nuclear reactor","The engine of the first nuclear submarine","A power plant built for Richland"],"answer":0,"explain":"It was the first full-scale reactor anywhere, and it made plutonium."},{"q":"B Reactor made the plutonium for which 1945 test?","options":["The Trinity test","The Bikini Atoll tests","The Nevada tests"],"answer":0,"explain":"It fueled the Trinity test and the bomb dropped on Nagasaki."},{"q":"What happened in 1943 to the farm towns near Hanford?","options":["They were cleared to make room for the project","They were flooded by a new dam","They were moved across the river"],"answer":0,"explain":"The towns were emptied in 1943. An exhibit here tells their story."}],"sources":["NPS and DOE Hanford tour pages"],"short":"Visitor Ctr"},{"id":"triton","name":"USS Triton Sail Park","group":"wheels","order":21,"lat":46.3487891,"lng":-119.2696318,"radiusM":120,"coordSource":"map lookup","address":"3250 Port of Benton Blvd, Richland","quiet":false,"tagline":"A submarine in the desert","story":"Stand at the base and look up. This is the sail of USS Triton, 75 feet long, and it once rode above a submarine that did something no vessel had done before. In 1960 Triton circled the entire globe underwater, 26,723 nautical miles in 84 days along Magellan's route. It ended up in the desert for a reason. The Navy's retired reactor compartments are unloaded at this port on their way to burial at Hanford.","lookFor":"The Saturn marker on the path toward the river, part of a scale-model solar system centered on the REACH Museum.","tip":"Interior tours run on the third Thursday of the month, March to November, by request to the Port of Benton.","hours":"Park open any time.","trivia":[{"q":"What did USS Triton do first, in 1960?","options":["Circled the globe underwater","Surfaced at the North Pole","Crossed the Pacific without refueling"],"answer":0,"explain":"It was the first submarine to travel around the world submerged."},{"q":"How long did Triton's underwater trip around the world take?","options":["84 days","8 days","365 days"],"answer":0,"explain":"84 days and 26,723 nautical miles, along Magellan's route."},{"q":"Why did a submarine's sail end up at this port?","options":["Retired Navy reactor compartments are unloaded here","Triton was built in Richland","It ran aground in the Columbia"],"answer":0,"explain":"The compartments come ashore here on their way to burial at Hanford."}],"sources":["Port of Benton, USS Triton Sail Park; NPS; HistoryLink 10805"],"short":"USS Triton"}],"badges":[{"id":"first-fission","name":"First Fission","icon":"spark","tone":"walk","rule":{"type":"visitCount","count":1},"blurb":"Check in at your first stop."},{"id":"uptown-regular","name":"Uptown Regular","icon":"sign","tone":"eat","rule":{"type":"visitCount","ids":["spudnut","alley","uptown","adventures","emerald","lees","rays"],"count":4},"blurb":"Check in at any four of the seven stops around Uptown."},{"id":"parkway-stroller","name":"Parkway Stroller","icon":"tree","tone":"wheels","rule":{"type":"visitCount","ids":["johndam","parkway","laundry","players","dyer","howardamon","atomicale","monterossos"],"count":5},"blurb":"Check in at any five of the eight stops around the Parkway and the riverfront."},{"id":"halfway-there","name":"Halfway There","icon":"half","tone":"walk","rule":{"type":"visitCount","count":11},"blurb":"Check in at eleven stops, any of them."},{"id":"atomic-appetite","name":"Atomic Appetite","icon":"donut","tone":"eat","rule":{"type":"visitCount","group":"eat","count":3},"blurb":"Check in at any three of the five eat and drink stops."},{"id":"secret-city-walker","name":"Secret City Walker","icon":"steps","tone":"walk","rule":{"type":"visitAll","group":"walk"},"blurb":"Visit all ten stops on the downtown walk."},{"id":"river-road-ranger","name":"River Road Ranger","icon":"wheel","tone":"wheels","rule":{"type":"visitAll","group":"wheels"},"blurb":"Reach all six bike or car stops."},{"id":"atomic-scholar","name":"Atomic Scholar","icon":"book","tone":"eat","rule":{"type":"triviaCorrect","count":12},"blurb":"Answer the trivia right at twelve different stops."},{"id":"atomic-city-passport","name":"Atomic City Passport","icon":"atom","tone":"ink","rule":{"type":"badges","ids":["secret-city-walker","atomic-appetite","river-road-ranger"]},"blurb":"Earn the Walker, Appetite and Ranger badges."}]}</script>
+<script>
+(() => {
+'use strict';
+
+/* ================= data ================= */
+const DATA = JSON.parse(document.getElementById('passport-data').textContent);
+const STOPS = DATA.stops.slice().sort((a, b) => a.order - b.order);
+const BYID = new Map(STOPS.map(s => [s.id, s]));
+const GROUPS = DATA.groups;
+const GNAME = Object.fromEntries(GROUPS.map(g => [g.id, g.name]));
+const $ = (sel, root = document) => root.querySelector(sel);
+const pad2 = n => String(n).padStart(2, '0');
+const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+const reduceMotion = () => window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* Storage is a swappable piece: browser storage now, something sturdier later. */
+const store = {
+  get(key, fallback) { try { const v = localStorage.getItem('tcp:' + key); return v == null ? fallback : JSON.parse(v); } catch (e) { return fallback; } },
+  set(key, value) { try { localStorage.setItem('tcp:' + key, JSON.stringify(value)); return true; } catch (e) { return false; } }
+};
+
+/* ================= geography: Web Mercator, the projection street maps use, scaled so one unit is one meter here (x east, y south) ================= */
+const LAT0 = 46.36, LNG0 = -119.31, TO_RAD = Math.PI / 180, WORLD = 6378137 * Math.cos(46.30 * TO_RAD);      // WORLD = map units per radian
+const mercY = lat => Math.log(Math.tan(Math.PI / 4 + lat * TO_RAD / 2));
+const P = (lat, lng) => ({ x: WORLD * (lng - LNG0) * TO_RAD, y: WORLD * (mercY(LAT0) - mercY(lat)) });
+STOPS.forEach(s => { const p = P(s.lat, s.lng); s.wx = p.x; s.wy = p.y; });
+
+/* Schematic context. The river bank and streets are simplified sketches anchored on the stops' own addresses. */
+const BANK = [[46.2600, -119.2630], [46.2660, -119.2655], [46.2700, -119.2672], [46.2736, -119.2686], [46.2780, -119.2690], [46.2850, -119.2685],
+  [46.2920, -119.2670], [46.3000, -119.2650], [46.3080, -119.2622], [46.3160, -119.2615], [46.3250, -119.2625], [46.3350, -119.2645],
+  [46.3420, -119.2660], [46.3488, -119.2672], [46.3560, -119.2680], [46.3640, -119.2684]].map(([a, b]) => P(a, b));
+const RIVER_W = 560;
+const TRAIL = BANK.filter(p => p.y <= P(46.2725, 0).y && p.y >= P(46.3495, 0).y).map(p => ({ x: p.x - 55, y: p.y }));
+const STREETS = [
+  { name: 'George Washington Way', at: 0.52, pts: [[46.2700, -119.2751], [46.2925, -119.2751]] },
+  { name: 'Jadwin Ave', at: 0.36, pts: [[46.2742, -119.2770], [46.2925, -119.2770]] },
+  { name: 'Williams Blvd', at: 0.72, pts: [[46.2862, -119.2751], [46.2862, -119.2816]] },
+  { name: 'Lee Blvd', at: 0.9, pts: [[46.2750, -119.2716], [46.2750, -119.2806]] },
+  { name: 'The Parkway', at: 0.5, pts: [[46.2734, -119.2743], [46.2758, -119.2743]] }
+].map(st => ({ name: st.name, at: st.at, pts: st.pts.map(([a, b]) => P(a, b)) }));
+const WALK = STOPS.filter(s => s.group === 'walk');
+const PRESETS = {
+  downtown: STOPS.filter(s => s.group !== 'wheels').map(s => s.id),
+  uptown: ['spudnut', 'alley', 'uptown', 'adventures', 'emerald', 'lees', 'rays'],
+  parkway: ['johndam', 'parkway', 'laundry', 'players', 'dyer', 'howardamon', 'atomicale', 'monterossos'],
+  all: STOPS.map(s => s.id)
+};
+
+/* ================= app state ================= */
+const app = $('#app');
+const state = { view: 'map', selected: null, preset: 'downtown' };
+const view = { s: 0.3, tx: 0, ty: 0 };      // screen = world * s + t
+let W = 0, H = 0, dpr = 1, S_MIN = 0.03, S_MAX = 3;
+let pendingFit = 'downtown', anim = 0, pinKey = '', moved = false, colors = null, lastFocus = null, sized = false;
+
+/* ================= progress (what this phone has done: visits, trivia, badges) ================= */
+const progress = { v: 2, name: '', visits: {}, trivia: {}, badges: {} };
+let storageWarned = false;
+const visited = id => Object.prototype.hasOwnProperty.call(progress.visits, id);
+const visitedCount = (group) => STOPS.filter(s => (!group || s.group === group) && visited(s.id)).length;
+function loadProgress() {          // tolerant of older saves (visits only) and of anything malformed
+  const p = store.get('progress', null); if (!p || typeof p !== 'object') return;
+  if (p.visits && typeof p.visits === 'object') Object.keys(p.visits).forEach(id => { if (BYID.has(id)) progress.visits[id] = p.visits[id]; });
+  if (p.trivia && typeof p.trivia === 'object') Object.keys(p.trivia).forEach(id => {
+    const s = BYID.get(id), t = p.trivia[id]; if (!s || !t || typeof t !== 'object' || !triviaOpen(id)) return;
+    const qs = bank(s), n = qs.length; if (!n) return;
+    const ok = k => Number.isInteger(k) && k >= 0 && k < n;
+    const last = t.last && ok(t.last.i) && Number.isInteger(t.last.pick) ? { i: t.last.i, pick: t.last.pick, ok: t.last.pick === qs[t.last.i].answer } : null;
+    progress.trivia[id] = { i: ok(t.i) ? t.i : 0, solved: typeof t.solved === 'string' ? t.solved : null, tries: Number.isFinite(t.tries) ? t.tries : 0, last };
+  });
+  if (p.badges && typeof p.badges === 'object') BADGES.forEach(b => { if (typeof p.badges[b.id] === 'string') progress.badges[b.id] = p.badges[b.id]; });
+  if (typeof p.name === 'string') progress.name = p.name.slice(0, 28);
+}
+function saveProgress() {
+  if (!store.set('progress', progress) && !storageWarned) { storageWarned = true; toast('This browser is not saving progress. It will last until this page closes.', 6000); }
+}
+const CHECK_SVG = '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6.5l2.6 2.6L10 3.4" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+function checkEl(cls) { const el = document.createElement('span'); el.className = cls; el.innerHTML = CHECK_SVG; return el; }
+
+let toastTimer = 0;
+function toast(msg, ms = 3200) {
+  const el = $('#toast'); el.textContent = msg; el.hidden = false;
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => { el.hidden = true; }, ms);
+}
+
+/* ================= location (a swappable piece: browser GPS now, native GPS later) ================= */
+const locator = {
+  state: 'unknown',            // 'unknown' until tried, 'ok' after a fix, 'off' when the browser or the person says no
+  last: null,
+  async probe() {              // never prompts
+    if (!('geolocation' in navigator)) { this.state = 'off'; return; }
+    try { const pol = document.permissionsPolicy || document.featurePolicy; if (pol && pol.allowsFeature && !pol.allowsFeature('geolocation')) { this.state = 'off'; return; } } catch (e) { /* not supported */ }
+    try {
+      if (navigator.permissions && navigator.permissions.query) {
+        const st = await navigator.permissions.query({ name: 'geolocation' });
+        if (st.state === 'denied') this.state = 'off';
+        st.onchange = () => { this.state = st.state === 'denied' ? 'off' : (this.state === 'off' ? 'unknown' : this.state); onLocatorChange(); };
+      }
+    } catch (e) { /* not supported */ }
+  },
+  get() {           // always asks for a fresh fix, so a stale position can never check you in
+    return new Promise((resolve, reject) => {
+      if (this.state === 'off') { reject({ code: 'off' }); return; }
+      navigator.geolocation.getCurrentPosition(
+        p => { this.state = 'ok'; this.last = { lat: p.coords.latitude, lng: p.coords.longitude, acc: p.coords.accuracy || 0, t: Date.now() }; resolve(this.last); },
+        e => { if (e.code === 1) this.state = 'off'; reject({ code: e.code === 1 ? 'off' : e.code === 3 ? 'timeout' : 'unavailable' }); },
+        { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 });
+    });
+  },
+  sample(ms) {      // for the field tools: several readings over a few seconds, keeping the tightest one
+    return new Promise((resolve, reject) => {
+      if (this.state === 'off') { reject({ code: 'off' }); return; }
+      let best = null, n = 0, id = null, timer = 0, over = false;
+      const finish = err => {
+        if (over) return; over = true; clearTimeout(timer);
+        if (id != null) { try { navigator.geolocation.clearWatch(id); } catch (e) { /* fine */ } }
+        if (best) { this.state = 'ok'; this.last = { lat: best.lat, lng: best.lng, acc: best.acc, t: Date.now() }; resolve({ lat: best.lat, lng: best.lng, acc: best.acc, n }); }
+        else reject(err || { code: 'timeout' });
+      };
+      try {
+        id = navigator.geolocation.watchPosition(
+          p => { n++; const f = { lat: p.coords.latitude, lng: p.coords.longitude, acc: p.coords.accuracy || 0 }; if (!best || f.acc < best.acc) best = f; if (n >= 8 || (n >= 3 && f.acc > 0 && f.acc <= 5)) finish(); },
+          e => { if (e.code === 1) { this.state = 'off'; finish({ code: 'off' }); } },
+          { enableHighAccuracy: true, timeout: ms, maximumAge: 0 });
+      } catch (e) { finish({ code: 'unavailable' }); return; }
+      timer = setTimeout(() => finish(), ms);
+    });
+  }
+};
+function metersBetween(aLat, aLng, bLat, bLng) {
+  const R = 6371000, toR = Math.PI / 180, dLat = (bLat - aLat) * toR, dLng = (bLng - aLng) * toR;
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(aLat * toR) * Math.cos(bLat * toR) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+function niceDistance(m) {
+  const ft = m * 3.28084;
+  if (ft < 1000) return Math.max(10, Math.round(ft / 10) * 10) + ' feet';
+  const mi = m / 1609.344; return (mi < 10 ? mi.toFixed(1) : Math.round(mi)) + (mi.toFixed(1) === '1.0' ? ' mile' : ' miles');
+}
+
+/* ================= map ================= */
+const mapEl = $('#view-map'), canvas = $('#map-canvas'), ctx = canvas.getContext('2d'), pinsEl = $('#pins');
+const isWide = () => window.matchMedia('(min-width: 900px)').matches;
+const mapVisible = () => W > 40 && H > 40;
+
+/* ================= street map: OpenStreetMap pictures under the same pins, when the app runs at its own address ================= */
+const HOSTED = (() => { try { return window.top === window.self && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1'); } catch (e) { return false; } })();
+const MAPCFG = DATA.app.map || {};
+const tiles = { can: HOSTED && typeof MAPCFG.tiles === 'string' && MAPCFG.tiles.indexOf('https://') === 0, on: false, hold: false, el: $('#tiles'), pool: new Map(), ok: 0, bad: 0, want: null };
+const TILE_PX = 256, Z_MIN = 11, Z_MAX = Math.min(MAPCFG.maxZoom || 19, 19);
+const zoomOf = s => Math.log2(s * WORLD * 2 * Math.PI / TILE_PX);          // the tile zoom at which one tile pixel is one screen pixel
+const scaleOf = z => TILE_PX * Math.pow(2, z) / (2 * Math.PI * WORLD);
+function snapScale(s, how) {        // with the street map on, the map rests on whole zoom levels, where the pictures are sharp
+  if (!tiles.on) return s;
+  const zf = zoomOf(s), z = how === 'floor' ? Math.floor(zf + 0.1) : how === 'ceil' ? Math.ceil(zf - 0.02) : Math.round(zf);      // 'floor' is for fitting: step up only if that spills by under 7 percent
+  return scaleOf(clamp(z, Z_MIN, Z_MAX));
+}
+function tileGeom(z) { const A = TILE_PX * Math.pow(2, z) / (2 * Math.PI); return { a: A / WORLD, ox: A * (LNG0 * TO_RAD + Math.PI), oy: A * (Math.PI - mercY(LAT0)) }; }
+function renderTiles() {
+  if (!tiles.on || !mapVisible()) return;
+  const z = clamp(Math.round(zoomOf(view.s)), Z_MIN, Z_MAX), g = tileGeom(z), n = Math.pow(2, z);
+  const x0 = Math.floor((-view.tx / view.s * g.a + g.ox) / TILE_PX), x1 = Math.floor(((W - view.tx) / view.s * g.a + g.ox) / TILE_PX);
+  const y0 = Math.max(0, Math.floor((-view.ty / view.s * g.a + g.oy) / TILE_PX)), y1 = Math.min(n - 1, Math.floor(((H - view.ty) / view.s * g.a + g.oy) / TILE_PX));
+  // ask only for what is on screen, and not while a zoom is still moving (no fetching of levels nobody stops on)
+  if (!tiles.hold && (x1 - x0 + 1) * (y1 - y0 + 1) <= 60) {
+    for (let x = x0; x <= x1; x++) for (let y = y0; y <= y1; y++) {
+      const key = z + '/' + x + '/' + y; if (tiles.pool.has(key)) continue;
+      const img = new Image(), t = { img, z, x, y, done: false };
+      img.alt = ''; img.draggable = false; img.decoding = 'async';
+      img.onload = () => { t.done = true; tiles.ok++; sweepTiles(); };
+      img.onerror = () => { t.done = true; tiles.bad++; img.style.visibility = 'hidden'; if (tiles.bad >= 4 && !tiles.ok) tilesFailed(); else sweepTiles(); };
+      img.src = MAPCFG.tiles.replace('{z}', z).replace('{x}', ((x % n) + n) % n).replace('{y}', y);
+      tiles.pool.set(key, t); tiles.el.appendChild(img);
+    }
+    tiles.want = { z, x0, x1, y0, y1 };
+  }
+  tiles.pool.forEach(t => {         // every picture, whatever its level, is placed by the same sums as the pins
+    const tg = t.z === z ? g : tileGeom(t.z);
+    const l = Math.round((t.x * TILE_PX - tg.ox) / tg.a * view.s + view.tx), r = Math.round(((t.x + 1) * TILE_PX - tg.ox) / tg.a * view.s + view.tx);
+    const tp = Math.round((t.y * TILE_PX - tg.oy) / tg.a * view.s + view.ty), b = Math.round(((t.y + 1) * TILE_PX - tg.oy) / tg.a * view.s + view.ty);
+    const st = t.img.style; st.width = (r - l) + 'px'; st.height = (b - tp) + 'px'; st.transform = 'translate3d(' + l + 'px,' + tp + 'px,0)'; st.zIndex = tiles.want && t.z === tiles.want.z ? 2 : 1;
+  });
+  if (!tiles.hold) sweepTiles();
+}
+function sweepTiles() {             // let go of other zoom levels once the current one has arrived, and of anything far off screen
+  const w = tiles.want; if (!w) return;
+  let waiting = 0; tiles.pool.forEach(t => { if (t.z === w.z && !t.done && t.x >= w.x0 && t.x <= w.x1 && t.y >= w.y0 && t.y <= w.y1) waiting++; });
+  tiles.pool.forEach((t, key) => {
+    const far = t.z === w.z && (t.x < w.x0 - 2 || t.x > w.x1 + 2 || t.y < w.y0 - 2 || t.y > w.y1 + 2);
+    if (far || (t.z !== w.z && (!waiting || tiles.pool.size > 90))) { t.img.onload = t.img.onerror = null; t.img.remove(); tiles.pool.delete(key); }
+  });
+}
+function clearTiles() { tiles.pool.forEach(t => { t.img.onload = t.img.onerror = null; t.img.remove(); }); tiles.pool.clear(); tiles.ok = tiles.bad = 0; tiles.want = null; tiles.hold = false; }
+function setMapStyle(style, quiet) {          // 'street' or 'drawn'; quiet = do not save it as the person's choice
+  const on = style === 'street' && tiles.can;
+  tiles.on = on; app.dataset.map = on ? 'street' : 'drawn';
+  if (!quiet) store.set('mapstyle', on ? 'street' : 'drawn');
+  if (!on) clearTiles();
+  S_MAX = on ? scaleOf(Z_MAX) : 3;
+  const b = $('#map-style'); b.hidden = !tiles.can; b.setAttribute('aria-pressed', String(on)); b.setAttribute('aria-label', on ? 'Street map is on. Switch to the drawn map' : 'Drawn map is on. Switch to the street map');
+  $('#map-note').hidden = on; $('#map-attrib').hidden = !on;
+  if (!mapVisible()) return;
+  setLimits();
+  const cx = W / 2, cy = H / 2, wx = (cx - view.tx) / view.s, wy = (cy - view.ty) / view.s, s2 = clamp(snapScale(view.s), S_MIN, S_MAX);
+  setView({ s: s2, tx: cx - wx * s2, ty: cy - wy * s2 });
+}
+function tilesFailed() { if (!tiles.on) return; setMapStyle('drawn', true); toast('The street map is not loading, so the drawn map is showing.', 6000); }
+function settleZoom(px, py) {       // after a pinch or a wheel: glide to the nearest whole level around the same spot, then fetch
+  tiles.hold = false;
+  if (!tiles.on) return;
+  const s2 = clamp(snapScale(view.s), S_MIN, S_MAX);
+  if (Math.abs(s2 - view.s) < view.s * 0.004) { render(); return; }
+  const wx = (px - view.tx) / view.s, wy = (py - view.ty) / view.s;
+  animateTo({ s: s2, tx: px - wx * s2, ty: py - wy * s2 }, 180);
+}
+function stepZoom(dir) {            // the plus and minus buttons
+  if (!tiles.on) { zoomAt(W / 2, H / 2, dir > 0 ? 1.6 : 1 / 1.6); return; }
+  const s2 = clamp(scaleOf(clamp(Math.round(zoomOf(view.s)) + dir, Z_MIN, Z_MAX)), S_MIN, S_MAX), wx = (W / 2 - view.tx) / view.s, wy = (H / 2 - view.ty) / view.s;
+  state.preset = null; markPreset(); animateTo({ s: s2, tx: W / 2 - wx * s2, ty: H / 2 - wy * s2 }, 220);
+}
+$('#map-style').addEventListener('click', () => setMapStyle(tiles.on ? 'drawn' : 'street'));
+
+function readColors() {
+  const cs = getComputedStyle(document.documentElement), g = n => cs.getPropertyValue(n).trim();
+  colors = { land: g('--land'), river: g('--river'), riverInk: g('--river-ink'), road: g('--road'), roadInk: g('--road-ink'), walk: g('--walk'), eat: g('--eat'), ink: g('--ink'), wheels: g('--wheels'), me: g('--me') };
+}
+function bboxOf(ids) {
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  ids.forEach(id => { const s = BYID.get(id); x0 = Math.min(x0, s.wx); x1 = Math.max(x1, s.wx); y0 = Math.min(y0, s.wy); y1 = Math.max(y1, s.wy); });
+  return { x: x0, y: y0, w: Math.max(x1 - x0, 60), h: Math.max(y1 - y0, 60) };
+}
+const footEl = $('.map-foot');
+function uiPad() { const foot = footEl ? footEl.offsetHeight + 24 : 0; return { t: 118, b: Math.max(92, foot), l: 34, r: 34 }; }   // pins rise 48px above their anchor, so the top needs room below the chips
+function fitTarget(bb, pad) {
+  const aw = Math.max(W - pad.l - pad.r, 40), ah = Math.max(H - pad.t - pad.b, 40);
+  const s = clamp(snapScale(clamp(Math.min(aw / bb.w, ah / bb.h), S_MIN, S_MAX), 'floor'), S_MIN, S_MAX);      // street map: the nearest whole level that still fits
+  return { s, tx: pad.l + aw / 2 - (bb.x + bb.w / 2) * s, ty: pad.t + ah / 2 - (bb.y + bb.h / 2) * s };
+}
+function setView(t) { view.s = t.s; view.tx = t.tx; view.ty = t.ty; clampView(); render(); }
+function animateTo(t, ms = 320) {
+  cancelAnimationFrame(anim);
+  if (reduceMotion() || !mapVisible()) { tiles.hold = false; setView(t); return; }
+  tiles.hold = true;                  // no map pictures are fetched for the levels a zoom passes through
+  const from = { ...view }, t0 = performance.now();
+  const step = now => {
+    const k = clamp((now - t0) / ms, 0, 1), e = 1 - Math.pow(1 - k, 3);
+    view.s = from.s + (t.s - from.s) * e; view.tx = from.tx + (t.tx - from.tx) * e; view.ty = from.ty + (t.ty - from.ty) * e;
+    if (k >= 1) { clampView(); tiles.hold = false; }
+    render();
+    if (k < 1) anim = requestAnimationFrame(step);
+  };
+  anim = requestAnimationFrame(step);
+}
+function clampView() {
+  view.s = clamp(view.s, S_MIN, S_MAX);
+  const bb = bboxOf(PRESETS.all), m = 70;       // keep some of the zone on screen
+  const minTx = m - (bb.x + bb.w) * view.s, maxTx = W - m - bb.x * view.s;
+  const minTy = m - (bb.y + bb.h) * view.s, maxTy = H - m - bb.y * view.s;
+  view.tx = clamp(view.tx, Math.min(minTx, maxTx), Math.max(minTx, maxTx));
+  view.ty = clamp(view.ty, Math.min(minTy, maxTy), Math.max(minTy, maxTy));
+}
+function applyPreset(name, animate = true) {
+  if (!PRESETS[name]) return;
+  state.preset = name; markPreset();
+  if (!mapVisible()) { pendingFit = name; return; }
+  const t = fitTarget(bboxOf(PRESETS[name]), uiPad());
+  animate ? animateTo(t) : setView(t);
+}
+function markPreset() { mapEl.querySelectorAll('.chip-btn').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.preset === state.preset))); }
+function zoomAt(px, py, factor) {
+  const s2 = clamp(view.s * factor, S_MIN, S_MAX), wx = (px - view.tx) / view.s, wy = (py - view.ty) / view.s;
+  view.s = s2; view.tx = px - wx * s2; view.ty = py - wy * s2;
+  state.preset = null; markPreset(); clampView(); render();
+}
+function setLimits() {             // how far out the map may zoom: far enough that the whole zone fits between the chips and the legend
+  const bbAll = bboxOf(PRESETS.all), rawFit = p => Math.min(Math.max(W - p.l - p.r, 40) / bbAll.w, Math.max(H - p.t - p.b, 40) / bbAll.h);
+  S_MIN = Math.min(rawFit({ t: 0, b: 0, l: 0, r: 0 }) * 0.6, rawFit(uiPad()) * 0.9);
+  if (tiles.on) S_MIN = scaleOf(clamp(Math.floor(zoomOf(S_MIN)), Z_MIN, Z_MAX));
+}
+function resize() {
+  const r = mapEl.getBoundingClientRect();
+  W = r.width; H = r.height;
+  if (!mapVisible()) return;
+  dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+  canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+  setLimits();
+  if (!sized || pendingFit) { const p = pendingFit || state.preset || 'downtown'; sized = true; pendingFit = null; applyPreset(p, false); if (state.selected) ensureVisible(false); }
+  else { clampView(); render(); }
+}
+
+const toScreen = p => ({ x: p.x * view.s + view.tx, y: p.y * view.s + view.ty });
+function draw() {
+  if (!colors) readColors();
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  if (tiles.on) ctx.clearRect(0, 0, W, H); else { ctx.fillStyle = colors.land; ctx.fillRect(0, 0, W, H); }      // the street map shows through; the drawn map paints its own ground
+  ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+
+  if (!tiles.on) {
+  // river band
+  ctx.beginPath();
+  BANK.forEach((p, i) => { const q = toScreen(p); i ? ctx.lineTo(q.x, q.y) : ctx.moveTo(q.x, q.y); });
+  for (let i = BANK.length - 1; i >= 0; i--) { const q = toScreen({ x: BANK[i].x + RIVER_W, y: BANK[i].y }); ctx.lineTo(q.x, q.y); }
+  ctx.closePath(); ctx.fillStyle = colors.river; ctx.fill();
+  // ripple lines, a nod to mid-century road maps
+  ctx.strokeStyle = colors.riverInk; ctx.globalAlpha = 0.22; ctx.lineWidth = 1.2;
+  [170, 330].forEach(off => { ctx.beginPath(); BANK.forEach((p, i) => { const q = toScreen({ x: p.x + off, y: p.y }); i ? ctx.lineTo(q.x, q.y) : ctx.moveTo(q.x, q.y); }); ctx.stroke(); });
+  ctx.globalAlpha = 1;
+
+  // riverfront trail
+  ctx.strokeStyle = colors.wheels; ctx.lineWidth = 2; ctx.setLineDash([7, 6]);
+  ctx.beginPath(); TRAIL.forEach((p, i) => { const q = toScreen(p); i ? ctx.lineTo(q.x, q.y) : ctx.moveTo(q.x, q.y); }); ctx.stroke(); ctx.setLineDash([]);
+
+  // streets
+  if (view.s > 0.12) {
+    ctx.strokeStyle = colors.road; ctx.lineWidth = clamp(view.s * 14, 2, 9);
+    STREETS.forEach(st => { const a = toScreen(st.pts[0]), b = toScreen(st.pts[1]); ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke(); });
+  }
+  }
+  // suggested walking order
+  if (view.s > 0.1) {
+    ctx.strokeStyle = colors.walk; ctx.lineWidth = tiles.on ? 3.5 : 2.5; ctx.setLineDash([1, 7]);
+    ctx.beginPath(); WALK.forEach((s, i) => { const q = toScreen({ x: s.wx, y: s.wy }); i ? ctx.lineTo(q.x, q.y) : ctx.moveTo(q.x, q.y); }); ctx.stroke(); ctx.setLineDash([]);
+  }
+  // check-in circle for the chosen stop
+  const sel = state.selected && BYID.get(state.selected);
+  if (sel && sel.radiusM * view.s > 12) {
+    const q = toScreen({ x: sel.wx, y: sel.wy });
+    ctx.strokeStyle = colors.ink; ctx.globalAlpha = tiles.on ? 0.8 : 0.45; ctx.lineWidth = tiles.on ? 2 : 1.5; ctx.setLineDash([4, 5]);
+    ctx.beginPath(); ctx.arc(q.x, q.y, sel.radiusM * view.s, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha = 1;
+  }
+  if (!tiles.on) {
+  // labels
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  if (view.s > 0.22) {
+    ctx.fillStyle = colors.roadInk; ctx.font = '600 11px Jost, "Century Gothic", sans-serif';
+    STREETS.forEach(st => {
+      const a = toScreen(st.pts[0]), b = toScreen(st.pts[1]);
+      const vertical = Math.abs(a.x - b.x) < Math.abs(a.y - b.y);
+      const len = Math.hypot(a.x - b.x, a.y - b.y); if (len < ctx.measureText(st.name).width * 1.7) return;
+      let x = a.x + (b.x - a.x) * st.at, y = a.y + (b.y - a.y) * st.at;
+      if (x < -50 || x > W + 50 || y < -50 || y > H + 50) return;
+      ctx.save(); ctx.translate(x, y); if (vertical) ctx.rotate(-Math.PI / 2);
+      const off = -clamp(view.s * 14, 2, 9) / 2 - 8;
+      ctx.strokeStyle = colors.land; ctx.lineWidth = 4; ctx.strokeText(st.name, 0, off); ctx.fillText(st.name, 0, off); ctx.restore();
+    });
+  }
+  // river name, kept inside the visible stretch of water
+  const midWorldY = (clamp(H / 2, 60, H - 60) - view.ty) / view.s;
+  let bx = BANK[0].x;
+  for (let i = 0; i < BANK.length - 1; i++) { const a = BANK[i], b = BANK[i + 1]; if (midWorldY <= a.y && midWorldY >= b.y) { bx = a.x + (b.x - a.x) * ((a.y - midWorldY) / (a.y - b.y)); break; } }
+  const rx = (bx + RIVER_W / 2) * view.s + view.tx;
+  if (rx > 20 && rx < W - 10 && RIVER_W * view.s > 26) {
+    ctx.save(); ctx.translate(rx, H / 2); ctx.rotate(-Math.PI / 2);
+    ctx.fillStyle = colors.riverInk; ctx.font = 'italic 500 ' + clamp(RIVER_W * view.s * 0.22, 12, 20) + 'px Jost, "Century Gothic", sans-serif';
+    ctx.fillText('Columbia River', 0, 0); ctx.restore();
+  }
+  }
+  // field captures: where the builder actually stood, tied back to the pin
+  if (field.on) Object.keys(field.pins).forEach(id => {
+    const s = BYID.get(id), c = field.pins[id]; if (!s) return;
+    const a = toScreen({ x: s.wx, y: s.wy }), b = toScreen(P(c.lat, c.lng));
+    ctx.strokeStyle = colors.ink; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+    ctx.fillStyle = colors.eat; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(b.x, b.y - 7); ctx.lineTo(b.x + 7, b.y); ctx.lineTo(b.x, b.y + 7); ctx.lineTo(b.x - 7, b.y); ctx.closePath(); ctx.fill(); ctx.stroke();
+  });
+  // you are here
+  if (locator.last && Date.now() - locator.last.t < 180000) {
+    const q = toScreen(P(locator.last.lat, locator.last.lng)), r = locator.last.acc * view.s;
+    if (r > 9) { ctx.fillStyle = colors.me; ctx.globalAlpha = 0.16; ctx.beginPath(); ctx.arc(q.x, q.y, r, 0, Math.PI * 2); ctx.fill(); ctx.globalAlpha = 1; }
+    ctx.fillStyle = colors.me; ctx.strokeStyle = '#FFFFFF'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(q.x, q.y, 7, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+  }
+}
+
+function computeClusters() {
+  const TH = 36, out = [], used = new Set();
+  const items = STOPS.map(s => ({ s, x: s.wx * view.s + view.tx, y: s.wy * view.s + view.ty }));
+  const seedFirst = state.selected ? items.filter(i => i.s.id === state.selected) : [];
+  seedFirst.forEach(i => { used.add(i.s.id); out.push([i]); });       // a selected stop always gets its own pin
+  for (const a of items) {
+    if (used.has(a.s.id)) continue;
+    const members = [a]; used.add(a.s.id);
+    for (const b of items) { if (!used.has(b.s.id) && Math.hypot(a.x - b.x, a.y - b.y) < TH) { members.push(b); used.add(b.s.id); } }
+    out.push(members);
+  }
+  return out;
+}
+function renderPins() {
+  const clusters = computeClusters();
+  const key = clusters.map(m => m.map(i => i.s.id).join('+')).join('|') + '#' + (state.selected || '') + '#' + Object.keys(progress.visits).sort().join(',');
+  if (key !== pinKey) {
+    pinKey = key; pinsEl.textContent = '';
+    clusters.forEach(m => {
+      const b = document.createElement('button'); b.type = 'button';
+      if (m.length === 1) {
+        const s = m[0].s; b.className = 'pin' + (s.id === state.selected ? ' is-selected' : ''); b.dataset.id = s.id; b.dataset.group = s.group;
+        b.setAttribute('aria-label', 'Stop ' + s.order + ': ' + s.name);
+        const shape = document.createElement('span'); shape.className = 'pin-shape';
+        const num = document.createElement('span'); num.className = 'pin-num'; num.textContent = s.order; shape.appendChild(num); b.appendChild(shape);
+        if (visited(s.id)) { b.classList.add('is-visited'); b.setAttribute('aria-label', 'Stop ' + s.order + ': ' + s.name + ', visited'); b.appendChild(checkEl('pin-check')); }
+        if (s.id === state.selected) { const tag = document.createElement('span'); tag.className = 'pin-tag'; tag.textContent = s.name; b.appendChild(tag); }
+      } else {
+        b.className = 'cluster'; b.dataset.ids = m.map(i => i.s.id).join(',');
+        b.setAttribute('aria-label', m.length + ' stops close together. Zoom in.');
+        const c = document.createElement('span'); c.textContent = m.length; b.appendChild(c);
+        const done = m.filter(i => visited(i.s.id)).length;
+        if (done) b.setAttribute('aria-label', m.length + ' stops close together, ' + done + ' visited. Zoom in.');
+        if (done === m.length) b.appendChild(checkEl('pin-check'));
+      }
+      pinsEl.appendChild(b);
+    });
+  }
+  const els = pinsEl.children;
+  clusters.forEach((m, i) => {
+    const x = m.reduce((a, c) => a + c.x, 0) / m.length, y = m.reduce((a, c) => a + c.y, 0) / m.length;
+    els[i].style.transform = 'translate3d(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px,0)';
+  });
+}
+const SCALES = [[50, '50 ft'], [100, '100 ft'], [250, '250 ft'], [500, '500 ft'], [1000, '1,000 ft'], [1320, '1/4 mile'], [2640, '1/2 mile'], [5280, '1 mile'], [10560, '2 miles']];
+function renderScale() {
+  let pick = SCALES[0];
+  const room = tiles.on && W < 340 ? 88 : 120;         // on the smallest phones the map credit shares this row
+  for (const sc of SCALES) { if (sc[0] * 0.3048 * view.s <= room) pick = sc; }
+  $('#scale-bar').style.width = Math.max(8, pick[0] * 0.3048 * view.s).toFixed(0) + 'px'; $('#scale-label').textContent = pick[1];
+}
+function render() { if (!mapVisible()) return; renderTiles(); draw(); renderPins(); renderScale(); }
+
+/* gestures: drag to pan, pinch or wheel to zoom */
+const pointers = new Map(); let gesture = null;
+mapEl.addEventListener('pointerdown', e => {
+  if (e.target.closest('.map-chips, .map-zoom')) return;
+  pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  if (pointers.size === 1) { moved = false; gesture = { type: 'pan', x: e.clientX, y: e.clientY, tx: view.tx, ty: view.ty }; }
+  else if (pointers.size === 2) {
+    const [a, b] = [...pointers.values()];
+    gesture = { type: 'pinch', d: Math.hypot(a.x - b.x, a.y - b.y) || 1, s: view.s }; moved = true; cancelAnimationFrame(anim); tiles.hold = tiles.on;
+  }
+});
+mapEl.addEventListener('pointermove', e => {
+  if (!pointers.has(e.pointerId) || !gesture) return;
+  pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  const rect = mapEl.getBoundingClientRect();
+  if (gesture.type === 'pan' && pointers.size === 1) {
+    const dx = e.clientX - gesture.x, dy = e.clientY - gesture.y;
+    if (!moved && Math.hypot(dx, dy) < 7) return;
+    if (!moved) { moved = true; try { mapEl.setPointerCapture(e.pointerId); } catch (err) { /* fine */ } cancelAnimationFrame(anim); tiles.hold = false; state.preset = null; markPreset(); }
+    view.tx = gesture.tx + dx; view.ty = gesture.ty + dy; clampView(); render();
+  } else if (gesture.type === 'pinch' && pointers.size >= 2) {
+    const [a, b] = [...pointers.values()];
+    const d = Math.hypot(a.x - b.x, a.y - b.y) || 1, cx = (a.x + b.x) / 2 - rect.left, cy = (a.y + b.y) / 2 - rect.top;
+    pinchAt = { x: cx, y: cy }; zoomAt(cx, cy, (gesture.s * d / gesture.d) / view.s);
+  }
+});
+let pinchAt = null, wheelTimer = 0;
+const endPointer = e => {
+  const wasPinch = !!(gesture && gesture.type === 'pinch');
+  pointers.delete(e.pointerId);
+  if (wasPinch && pointers.size < 2) { const at = pinchAt || { x: W / 2, y: H / 2 }; pinchAt = null; settleZoom(at.x, at.y); }
+  if (pointers.size === 1) { const [p] = [...pointers.values()]; gesture = { type: 'pan', x: p.x, y: p.y, tx: view.tx, ty: view.ty }; }
+  else if (pointers.size === 0) { gesture = null; setTimeout(() => { moved = false; }, 0); }
+};
+mapEl.addEventListener('pointerup', endPointer); mapEl.addEventListener('pointercancel', endPointer);
+/* the map moves by redrawing, never by scrolling: if a browser scrolls a panel to chase focus, put it back */
+const FIXED_PANELS = [mapEl, pinsEl, mapEl.parentElement, $('#app')];
+function pinPanels() { FIXED_PANELS.forEach(el => { if (el && (el.scrollLeft || el.scrollTop)) { el.scrollLeft = 0; el.scrollTop = 0; } }); if (window.scrollX || window.scrollY) window.scrollTo(0, 0); }
+document.addEventListener('scroll', e => { if (e.target === document || FIXED_PANELS.includes(e.target)) pinPanels(); }, true);
+/* keyboard: a pin that takes focus while off screen is brought into view by moving the map */
+pinsEl.addEventListener('focusin', e => {
+  const b = e.target.closest('.pin, .cluster'); if (!b || !b.matches(':focus-visible')) return;
+  pinPanels();
+  const m = /translate3d\(([-\d.]+)px,\s*([-\d.]+)px/.exec(b.style.transform); if (!m) return;
+  const x = +m[1], y = +m[2], pad = uiPad();
+  if (x >= pad.l && x <= W - pad.r && y >= pad.t && y <= H - pad.b) return;
+  const keep = b.dataset.id || b.dataset.ids;
+  state.preset = null; markPreset();
+  setView({ s: view.s, tx: view.tx + (W / 2 - x), ty: view.ty + ((pad.t + H - pad.b) / 2 - y) });
+  const again = [...pinsEl.children].find(el => (el.dataset.id || el.dataset.ids) === keep);
+  if (again && again !== document.activeElement) again.focus({ preventScroll: true });
+});
+mapEl.addEventListener('wheel', e => {
+  e.preventDefault(); const r = mapEl.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
+  cancelAnimationFrame(anim); tiles.hold = tiles.on; zoomAt(x, y, Math.exp(-e.deltaY * 0.0016));
+  clearTimeout(wheelTimer); wheelTimer = setTimeout(() => settleZoom(x, y), 170);
+}, { passive: false });
+$('#zoom-in').addEventListener('click', () => stepZoom(1));
+$('#zoom-out').addEventListener('click', () => stepZoom(-1));
+mapEl.querySelectorAll('.chip-btn').forEach(b => b.addEventListener('click', () => applyPreset(b.dataset.preset)));
+pinsEl.addEventListener('click', e => {
+  if (moved) return;
+  const pin = e.target.closest('.pin'), cl = e.target.closest('.cluster');
+  if (pin) openStop(pin.dataset.id);
+  else if (cl) { state.preset = null; markPreset(); const ids = cl.dataset.ids.split(','); const bb = bboxOf(ids); const p = uiPad(); const t = fitTarget({ x: bb.x - 25, y: bb.y - 25, w: bb.w + 50, h: bb.h + 50 }, p); if (t.s <= view.s * 1.05) { t.s = tiles.on ? clamp(scaleOf(Math.round(zoomOf(view.s)) + 1), S_MIN, S_MAX) : Math.min(view.s * 1.8, S_MAX); Object.assign(t, recenter(bb, t.s, p)); } animateTo(t); }
+});
+function recenter(bb, s, pad) { const aw = W - pad.l - pad.r, ah = H - pad.t - pad.b; return { tx: pad.l + aw / 2 - (bb.x + bb.w / 2) * s, ty: pad.t + ah / 2 - (bb.y + bb.h / 2) * s }; }
+
+/* keep the chosen pin clear of the card */
+function ensureVisible(animate = true) {
+  const s = BYID.get(state.selected); if (!s || !mapVisible()) return;
+  const card = $('#card'); const pad = uiPad();
+  let right = W - pad.r, bottom = H - pad.b;
+  if (!card.hidden && !isWide()) bottom = Math.min(bottom, card.getBoundingClientRect().top - mapEl.getBoundingClientRect().top - 24);
+  bottom = Math.max(bottom, pad.t + 40);
+  const p = toScreen({ x: s.wx, y: s.wy });
+  if (p.x >= pad.l && p.x <= right && p.y >= pad.t && p.y <= bottom) { render(); return; }
+  const t = { s: view.s, tx: (pad.l + right) / 2 - s.wx * view.s, ty: (pad.t + bottom) / 2 + 20 - s.wy * view.s };
+  state.preset = null; markPreset();
+  animate ? animateTo(t) : setView(t);
+}
+
+/* ================= stop list ================= */
+const listEl = $('#view-stops');
+function buildList() {
+  listEl.textContent = '';
+  const intro = document.createElement('div'); intro.className = 'list-intro';
+  const ih = document.createElement('h2'); ih.textContent = 'Atomic Richland';
+  const ip = document.createElement('p'); ip.textContent = STOPS.length + ' stops in the city the Manhattan Project built. Pick any stop to read its story.';
+  const pr = document.createElement('div'); pr.className = 'progress';
+  pr.innerHTML = '<span class="progress-track"><i class="progress-fill" id="progress-fill"></i></span><span class="progress-label" id="progress-label"></span>';
+  intro.append(ih, ip, pr); listEl.appendChild(intro);
+  GROUPS.forEach(g => {
+    const stops = STOPS.filter(s => s.group === g.id);
+    const sec = document.createElement('section'); sec.className = 'group';
+    const head = document.createElement('div'); head.className = 'group-head';
+    const h = document.createElement('h2'); h.textContent = g.name;
+    const c = document.createElement('span'); c.className = 'group-count'; c.id = 'count-' + g.id;
+    head.append(h, c);
+    const bl = document.createElement('p'); bl.className = 'group-blurb'; bl.textContent = g.blurb;
+    const ul = document.createElement('ul'); ul.className = 'rows';
+    stops.forEach(s => {
+      const li = document.createElement('li');
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'row'; b.dataset.id = s.id; b.dataset.group = s.group; b.id = 'row-' + s.id;
+      const n = document.createElement('span'); n.className = 'row-num'; n.textContent = s.order;
+      const t = document.createElement('span');
+      const nm = document.createElement('span'); nm.className = 'row-name'; nm.textContent = s.name;
+      const tg = document.createElement('span'); tg.className = 'row-tag'; tg.textContent = s.tagline;
+      n.appendChild(checkEl('row-check'));
+      const st = document.createElement('span'); st.className = 'row-state'; st.id = 'state-' + s.id;
+      t.append(nm, tg); b.append(n, t, st); li.appendChild(b); ul.appendChild(li);
+    });
+    sec.append(head, bl, ul); listEl.appendChild(sec);
+  });
+  const foot = document.createElement('p'); foot.className = 'list-foot';
+  foot.textContent = DATA.app.zone + '. Stories and hours checked ' + niceDate(DATA.app.factsChecked) + '.';
+  const ab = document.createElement('button'); ab.type = 'button'; ab.className = 'link-btn'; ab.id = 'list-about'; ab.textContent = 'About, privacy and starting over';
+  foot.appendChild(ab); listEl.appendChild(foot);
+}
+function renderReset(confirming) {
+  const rr = $('#reset-row'); if (!rr) return; rr.textContent = '';
+  const mk = (id, label) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'link-btn'; b.id = id; b.textContent = label; return b; };
+  if (!confirming) { rr.appendChild(mk('reset-ask', 'Reset my progress')); return; }
+  const q = document.createElement('span'); q.textContent = 'Clear every check-in, trivia answer and badge on this phone?';
+  rr.append(q, mk('reset-yes', 'Yes, clear them'), mk('reset-no', 'Keep them'));
+}
+listEl.addEventListener('click', e => { if (e.target.closest('#list-about')) openAbout(); });
+/* everything that shows visits, trivia or badges, refreshed together */
+function refreshProgress() {
+  const total = STOPS.length, done = visitedCount();
+  const fill = $('#progress-fill'); if (fill) fill.style.width = (100 * done / total).toFixed(1) + '%';
+  const lab = $('#progress-label'); if (lab) lab.textContent = done + ' of ' + total + ' visited';
+  $('#map-progress').textContent = done + '/' + total + ' visited';
+  GROUPS.forEach(g => { const el = $('#count-' + g.id); if (el) el.textContent = visitedCount(g.id) + ' of ' + STOPS.filter(s => s.group === g.id).length; });
+  STOPS.forEach(s => {
+    const row = $('#row-' + s.id), st = $('#state-' + s.id); if (!row) return;
+    row.classList.toggle('is-visited', visited(s.id)); st.textContent = visited(s.id) ? 'Visited' : '';
+    if (solved(s.id)) { const tm = make('span', 'row-trivia', 'Trivia'); tm.appendChild(checkEl('mini-check')); st.appendChild(tm); }
+  });
+  pinKey = ''; render();
+  renderBadges(); renderPassport(); renderFieldSummary();
+  if (state.selected) { renderCheckin(); renderTrivia(); renderNextUp(); renderField(); }
+}
+function niceDate(iso) { const [y, m] = iso.split('-').map(Number); return ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][m - 1] + ' ' + y; }
+listEl.addEventListener('click', e => { const row = e.target.closest('.row'); if (row) openStop(row.dataset.id); });
+
+/* ================= passport card ================= */
+const card = $('#card');
+function fillCard(s) {
+  card.dataset.group = s.group;
+  $('#card-num').textContent = pad2(s.order);
+  $('#card-kicker').textContent = 'Stop ' + s.order + ' of ' + STOPS.length;
+  $('#card-group').textContent = GNAME[s.group];
+  $('#card-title').textContent = s.name;
+  $('#card-tagline').textContent = s.tagline;
+  $('#card-quiet').hidden = !s.quiet;
+  $('#card-story').textContent = s.story;
+  $('#card-look').textContent = s.lookFor;
+  $('#card-tip').textContent = s.tip;
+  $('#card-hours').textContent = s.hours;
+  $('#card-asof').textContent = 'Checked ' + niceDate(DATA.app.factsChecked) + '. Hours change.';
+  $('#card-where').textContent = s.address;
+  $('#card-source').textContent = 'Source: ' + s.sources.join('; ') + '.';
+  $('#card-dir').href = 'https://www.google.com/maps/dir/?api=1&destination=' + s.lat + ',' + s.lng;
+  const i = STOPS.indexOf(s);
+  $('#card-prev').disabled = i === 0; $('#card-next').disabled = i === STOPS.length - 1;
+  $('#card-scroll').scrollTop = 0;
+  renderCheckin(); renderTrivia(); renderNextUp(); renderField();
+}
+
+/* ---- check-in: GPS first, with an honest fallback for anyone ---- */
+let ci = { state: 'idle' };   // idle | locating | far | error | undo
+function whenText(v) {
+  let d = ''; const dt = new Date(v.t);
+  if (!isNaN(dt)) { try { d = dt.toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }); } catch (e) { d = ''; } }
+  return (d ? d + ', ' : '') + (v.m === 'gps' ? 'by GPS' : 'by tap');
+}
+function renderCheckin() {
+  const box = $('#checkin'), s = BYID.get(state.selected); if (!s) return;
+  box.textContent = '';
+  const btn = (id, label, solid, disabled) => { const b = document.createElement('button'); b.type = 'button'; b.id = id; b.className = 'btn' + (solid ? ' btn-solid' : ''); b.textContent = label; if (disabled) b.disabled = true; return b; };
+  const msg = (cls, text) => { const p = document.createElement('p'); p.className = cls; p.textContent = text; return p; };
+  const row = (...els) => { const r = document.createElement('div'); r.className = 'ci-row'; r.append(...els); return r; };
+  const isDone = visited(s.id);
+  $('#card-visited').hidden = !isDone;
+  if (isDone && ci.state === 'undo') { box.append(msg('ci-msg', 'Remove this check-in?' + (progress.trivia[s.id] ? ' Its trivia answer goes too.' : '')), row(btn('ci-keep', 'Keep it', false), btn('ci-remove', 'Remove', true))); return; }
+  if (isDone) {
+    const d = document.createElement('div'); d.className = 'ci-done';
+    const t = document.createElement('span'); t.className = 'ci-text'; t.textContent = 'Checked in';
+    const w = document.createElement('span'); w.className = 'ci-when'; w.textContent = whenText(progress.visits[s.id]); t.appendChild(w);
+    const u = document.createElement('button'); u.type = 'button'; u.className = 'link-btn'; u.id = 'ci-undo'; u.textContent = 'Undo';
+    d.append(checkEl('ci-check'), t, u); box.appendChild(d);
+    // the main button is always the next thing to do: answer the trivia, then move on, then admire the full passport
+    if (bank(s).length && triviaOpen(s.id) && !solved(s.id)) box.appendChild(btn('ci-trivia', 'Trivia question', true));
+    else { const n = nextStopFor(s.id); box.appendChild(n ? btn('ci-next', 'Next: ' + (n.short || n.name), true) : btn('ci-passport', 'See my passport', true)); }
+    return;
+  }
+  if (ci.state === 'locating') { box.appendChild(btn('ci-go', 'Finding you...', true, true)); return; }
+  if (ci.state === 'far') {
+    let text = 'You look about ' + niceDistance(ci.dist) + ' from this stop.';
+    if (ci.acc > 100) text += ' Your GPS is only good to about ' + niceDistance(ci.acc) + ' right now.';
+    box.append(msg('ci-msg', text), row(btn('ci-retry', 'Try again', false), btn('ci-manual', "I'm here anyway", true))); return;
+  }
+  if (ci.state === 'error') { box.append(msg('ci-msg', 'Could not get a location fix.'), row(btn('ci-retry', 'Try again', false), btn('ci-manual', "I'm here anyway", true))); return; }
+  if (locator.state === 'off') { box.append(btn('ci-manual', "I'm here", true), msg('ci-note', 'Location is off here, so check-ins run on the honor system.')); return; }
+  box.appendChild(btn('ci-go', 'Check in', true));
+}
+function recordVisit(id, method, fix) {
+  const s = BYID.get(id); if (!s) return;
+  progress.visits[id] = { t: new Date().toISOString(), m: method };
+  if (fix) { progress.visits[id].d = Math.round(fix.dist); progress.visits[id].a = Math.round(fix.acc); }
+  ci = { state: 'idle' };
+  const fresh = commit();
+  if (s.quiet) { toast('Visit recorded.' + (fresh.length ? ' ' + awardLine(fresh) : ''), fresh.length ? 5000 : 3200); return; }   // no fanfare at a quiet stop
+  toast('Checked in at ' + s.name + '.');
+  if (state.selected === id) { const stamp = $('#card-num'); stamp.classList.remove('just-stamped'); void stamp.offsetWidth; stamp.classList.add('just-stamped'); }
+  if (fresh.length) showAward(fresh);
+}
+function tryGps() {
+  const id = state.selected, s = BYID.get(id); if (!s) return;
+  ci = { state: 'locating' }; renderCheckin();
+  locator.get().then(fix => {
+    const dist = metersBetween(fix.lat, fix.lng, s.lat, s.lng);
+    onLocatorChange();
+    if (dist <= s.radiusM + Math.min(fix.acc, 50)) { if (state.selected !== id) ci = { state: 'idle' }; recordVisit(id, 'gps', { dist, acc: fix.acc }); return; }
+    if (state.selected !== id) return;
+    ci = { state: 'far', dist, acc: fix.acc }; renderCheckin();
+  }).catch(err => {
+    onLocatorChange();
+    if (state.selected !== id) return;
+    ci = { state: err && err.code === 'off' ? 'idle' : 'error' }; renderCheckin();
+    if (err && err.code === 'off') toast('Location is not available here. You can still check in by tap.');
+  });
+}
+$('#checkin').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b || b.disabled || !state.selected) return;
+  if (b.id === 'ci-go' || b.id === 'ci-retry') tryGps();
+  else if (b.id === 'ci-manual') recordVisit(state.selected, 'manual');
+  else if (b.id === 'ci-undo') { ci = { state: 'undo' }; renderCheckin(); }
+  else if (b.id === 'ci-keep') { ci = { state: 'idle' }; renderCheckin(); }
+  else if (b.id === 'ci-trivia') goTrivia();
+  else if (b.id === 'ci-next') { const n = nextStopFor(state.selected); if (n) openStop(n.id, { keepFocus: true }); }
+  else if (b.id === 'ci-passport') { closeCard(); switchView('passport'); }
+  else if (b.id === 'ci-remove') {
+    const before = Object.keys(progress.badges).length;
+    delete progress.visits[state.selected]; if (TRIVIA_UNLOCK === 'checkin') delete progress.trivia[state.selected];
+    ci = { state: 'idle' }; commit();
+    const lost = before - Object.keys(progress.badges).length;
+    toast(lost > 0 ? 'Check-in removed, and ' + (lost === 1 ? 'a badge' : lost + ' badges') + ' with it.' : 'Check-in removed.');
+  }
+});
+function onLocatorChange() {
+  $('#find-me').hidden = locator.state === 'off';
+  if (state.selected && ci.state === 'idle') renderCheckin();
+  if (state.selected && field.on && cap.state !== 'reading') renderField();
+  render();
+}
+$('#find-me').addEventListener('click', () => {
+  toast('Finding you...', 12000);
+  locator.get().then(fix => {
+    onLocatorChange();
+    const p = P(fix.lat, fix.lng), bb = bboxOf(PRESETS.all);
+    if (p.x < bb.x - 3000 || p.x > bb.x + bb.w + 3000 || p.y < bb.y - 3000 || p.y > bb.y + bb.h + 3000) { toast('You look to be outside this zone, so the map stays put.', 5000); return; }
+    toast('There you are.'); state.preset = null; markPreset();
+    const z = clamp(snapScale(Math.max(view.s, 0.6), 'ceil'), S_MIN, S_MAX); animateTo({ s: z, tx: W / 2 - p.x * z, ty: H / 2 - p.y * z });
+  }).catch(() => { onLocatorChange(); toast('Location is not available here.'); });
+});
+function openStop(id, opts = {}) {
+  const s = BYID.get(id); if (!s) return;
+  if (card.hidden && !opts.keepFocus) lastFocus = document.activeElement;
+  if (state.selected !== id) { ci = { state: 'idle' }; cap = { state: 'idle' }; card.classList.remove('is-tall'); }
+  state.selected = id; fillCard(s); card.hidden = false;
+  listEl.querySelectorAll('.row.is-selected').forEach(r => r.classList.remove('is-selected'));
+  const row = $('#row-' + id); if (row) { row.classList.add('is-selected'); if (isWide() || state.view === 'stops') row.scrollIntoView({ block: 'nearest' }); }
+  if (!opts.noFocus) $('#card-title').focus({ preventScroll: true });
+  setHash('s-' + id);
+  requestAnimationFrame(() => ensureVisible(true));
+}
+function closeCard() {
+  if (card.hidden) return;
+  state.selected = null; card.hidden = true; card.classList.remove('is-tall');
+  listEl.querySelectorAll('.row.is-selected').forEach(r => r.classList.remove('is-selected'));
+  setHash(state.view); render();
+  if (lastFocus && document.contains(lastFocus)) { try { lastFocus.focus({ preventScroll: true }); } catch (e) { /* fine */ } }
+  lastFocus = null;
+}
+$('#card-close').addEventListener('click', closeCard);
+$('#card-prev').addEventListener('click', () => step(-1));
+$('#card-next').addEventListener('click', () => step(1));
+function step(d) { const i = STOPS.findIndex(s => s.id === state.selected) + d; if (i >= 0 && i < STOPS.length) openStop(STOPS[i].id, { keepFocus: true }); }
+$('#card-show').addEventListener('click', () => {
+  const s = BYID.get(state.selected); if (!s) return;
+  if (state.view !== 'map' && !isWide()) switchView('map');
+  requestAnimationFrame(() => { if (!mapVisible()) resize(); const z = clamp(snapScale(Math.max(view.s, 0.9), 'ceil'), S_MIN, S_MAX); const p = uiPad();
+    const bottom = isWide() ? H - p.b : Math.max(p.t + 40, card.getBoundingClientRect().top - mapEl.getBoundingClientRect().top - 24);
+    animateTo({ s: z, tx: W / 2 - s.wx * z, ty: (p.t + bottom) / 2 + 20 - s.wy * z }); state.preset = null; markPreset(); });
+});
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  if (!award.hidden) closeAward(false); else if (!share.hidden) closeDialog(share); else if (!about.hidden) closeAbout(); else if (!welcome.hidden) closeWelcome(); else if (!card.hidden) closeCard();
+});
+
+/* ================= trivia: a small bank per stop, unlocked by checking in ================= */
+const TRIVIA_UNLOCK = (DATA.app.trivia && DATA.app.trivia.unlock) || 'checkin';
+const bank = s => Array.isArray(s.trivia) ? s.trivia : (s.trivia ? [s.trivia] : []);
+const triviaOpen = id => TRIVIA_UNLOCK !== 'checkin' || visited(id);
+const solved = id => !!(progress.trivia[id] && progress.trivia[id].solved);
+const solvedCount = () => STOPS.filter(s => solved(s.id)).length;
+const shuffles = new Map();     // the on-screen order of each question's answers, reshuffled whenever a question comes round again
+function orderFor(id, i, n) {
+  const k = id + ':' + i;
+  if (!shuffles.has(k)) {
+    const a = Array.from({ length: n }, (_, j) => j);
+    for (let j = n - 1; j > 0; j--) { const r = Math.floor(Math.random() * (j + 1)); const t = a[j]; a[j] = a[r]; a[r] = t; }
+    shuffles.set(k, a);
+  }
+  return shuffles.get(k);
+}
+const X_SVG = '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 2.5l7 7M9.5 2.5l-7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>';
+const LOCK_SVG = '<svg viewBox="0 0 20 20" aria-hidden="true"><rect x="4" y="9" width="12" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M7 9V6.5a3 3 0 0 1 6 0V9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+function make(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+function mark(svg, text) { const m = make('span', 'opt-mark'); m.innerHTML = svg; m.appendChild(document.createTextNode(text)); return m; }
+function renderTrivia() {
+  const box = $('#card-trivia'), s = BYID.get(state.selected); if (!s) return;
+  const qs = bank(s); box.hidden = !qs.length; box.textContent = ''; if (!qs.length) return;
+  const head = make('div', 'trivia-head'); head.appendChild(make('h3', '', 'Trivia'));
+  const st = make('span', 'trivia-state'); st.id = 'trivia-state'; head.appendChild(st); box.appendChild(head);
+  if (!triviaOpen(s.id)) {
+    st.textContent = 'Locked';
+    const p = make('p', 'trivia-locked'); p.id = 'trivia-locked'; p.innerHTML = LOCK_SVG; p.appendChild(make('span', '', "Check in here to unlock this stop's trivia question.")); box.appendChild(p);
+    return;
+  }
+  const t = progress.trivia[s.id] || { i: 0, solved: null, tries: 0, last: null };
+  const i = clamp(t.i, 0, qs.length - 1), q = qs[i], done = !!(t.last && t.last.i === i);
+  if (t.solved) { st.classList.add('is-solved'); st.appendChild(checkEl('mini-check')); st.appendChild(document.createTextNode('Solved')); } else st.textContent = 'Unsolved';
+  const qp = make('p', 'trivia-q', q.q); qp.id = 'trivia-q'; qp.tabIndex = -1; box.appendChild(qp);
+  const group = make('div', 'trivia-options'); group.id = 'trivia-options'; group.setAttribute('role', 'group'); group.setAttribute('aria-labelledby', 'trivia-q');
+  orderFor(s.id, i, q.options.length).forEach((orig, pos) => {
+    const b = make('button', 'opt'); b.type = 'button'; b.dataset.pick = orig;
+    b.appendChild(make('span', 'opt-key', 'ABCDEF'.charAt(pos)));
+    const body = make('span', 'opt-body'); body.appendChild(make('span', 'opt-text', q.options[orig]));
+    if (done) {
+      b.disabled = true;
+      if (orig === q.answer) { b.classList.add('is-right'); body.appendChild(mark(CHECK_SVG, 'Right answer')); }
+      else if (orig === t.last.pick) { b.classList.add('is-wrong'); body.appendChild(mark(X_SVG, 'Your pick')); }
+      else b.classList.add('is-dim');
+    }
+    b.appendChild(body); group.appendChild(b);
+  });
+  box.appendChild(group);
+  if (!done) return;
+  const v = make('p', 'trivia-verdict', t.last.ok ? 'Correct.' : 'Not quite.'); v.id = 'trivia-verdict'; v.tabIndex = -1; v.setAttribute('role', 'status'); box.appendChild(v);
+  const ex = make('p', 'trivia-explain', q.explain); ex.id = 'trivia-explain'; box.appendChild(ex);
+  if (qs.length > 1) { const nb = make('button', 'btn btn-sm', t.solved ? 'Another question, just for fun' : 'Try another question'); nb.type = 'button'; nb.id = 'trivia-next'; box.appendChild(nb); }
+}
+/* scroll inside the card only, never the page: 'top' brings the node to the top, 'show' brings it into view */
+function scrollCardTo(node, align) {
+  const sc = $('#card-scroll'); if (!node || !sc) return;
+  const r = node.getBoundingClientRect(), c = sc.getBoundingClientRect();
+  let top = sc.scrollTop;
+  const need = r.bottom - c.bottom + 14, room = r.top - c.top - 6;      // need: how far the end is below the fold; room: how far the top can rise
+  if (align === 'top') top += room;
+  else if (need > 0) top += r.height + 20 <= c.height ? Math.min(need, room) : need;   // too tall to show whole: favour the end, where the verdict is
+  else if (room < 0) top += room;
+  else return;
+  try { sc.scrollTo({ top, behavior: reduceMotion() ? 'auto' : 'smooth' }); } catch (e) { sc.scrollTop = top; }
+}
+function goTrivia() {
+  card.classList.add('is-tall');
+  requestAnimationFrame(() => { scrollCardTo($('#card-trivia'), 'top'); const q = $('#trivia-q'); if (q) q.focus({ preventScroll: true }); });
+}
+function answerTrivia(id, pick) {
+  const s = BYID.get(id); if (!s || !triviaOpen(id)) return;
+  const qs = bank(s); if (!qs.length) return;
+  const t = progress.trivia[id] || (progress.trivia[id] = { i: 0, solved: null, tries: 0, last: null });
+  t.i = clamp(t.i, 0, qs.length - 1);
+  if (t.last && t.last.i === t.i) return;                       // this one is already answered
+  const ok = pick === qs[t.i].answer;
+  t.tries += 1; t.last = { i: t.i, pick, ok };
+  if (ok && !t.solved) t.solved = new Date().toISOString();
+  const fresh = commit();
+  const v = $('#trivia-verdict'); if (v) v.focus({ preventScroll: true });
+  requestAnimationFrame(() => scrollCardTo($('#card-trivia'), 'show'));
+  if (fresh.length) { if (s.quiet) toast(awardLine(fresh), 5000); else showAward(fresh); }
+}
+function nextTrivia(id) {
+  const s = BYID.get(id), t = progress.trivia[id]; if (!s || !t) return;
+  shuffles.delete(id + ':' + t.i);
+  t.i = (t.i + 1) % bank(s).length; t.last = null;
+  shuffles.delete(id + ':' + t.i);
+  saveProgress(); renderTrivia();
+  const q = $('#trivia-q'); if (q) q.focus({ preventScroll: true });
+  requestAnimationFrame(() => scrollCardTo($('#card-trivia'), 'show'));
+}
+$('#card-trivia').addEventListener('click', e => {
+  if (!state.selected) return;
+  const o = e.target.closest('.opt');
+  if (o && !o.disabled) answerTrivia(state.selected, Number(o.dataset.pick));
+  else if (e.target.closest('#trivia-next')) nextTrivia(state.selected);
+});
+
+/* ================= badges: always worked out from what this phone has done ================= */
+const BADGES = Array.isArray(DATA.badges) ? DATA.badges : [];
+const BADGE_BY = new Map(BADGES.map(b => [b.id, b]));
+const earned = id => Object.prototype.hasOwnProperty.call(progress.badges, id);
+function badgeProgress(b, seen) {
+  const r = b.rule || {}; let have = 0, need = 1, pool = null;
+  if (r.type === 'visitAll') { pool = STOPS.filter(s => s.group === r.group).map(s => s.id); need = pool.length; have = pool.filter(visited).length; }
+  else if (r.type === 'visitCount') { pool = Array.isArray(r.ids) ? r.ids.filter(id => BYID.has(id)) : STOPS.filter(s => !r.group || s.group === r.group).map(s => s.id); need = r.count; have = pool.filter(visited).length; }
+  else if (r.type === 'triviaCorrect') { need = r.count; have = solvedCount(); }
+  else if (r.type === 'badges') {
+    seen = seen || new Set(); seen.add(b.id); need = r.ids.length;
+    have = r.ids.filter(id => { const o = BADGE_BY.get(id); return o && !seen.has(id) && badgeProgress(o, seen).done; }).length;
+  }
+  need = Math.max(1, need | 0);
+  return { have: Math.min(have, need), need, done: have >= need, pool };
+}
+function syncBadges() {          // returns the badges that were just earned; takes back any that no longer hold
+  const fresh = [];
+  BADGES.forEach(b => {
+    const done = badgeProgress(b).done;
+    if (done && !earned(b.id)) { progress.badges[b.id] = new Date().toISOString(); fresh.push(b); }
+    else if (!done && earned(b.id)) delete progress.badges[b.id];
+  });
+  return fresh;
+}
+function commit() { const fresh = syncBadges(); saveProgress(); refreshProgress(); return fresh; }
+const awardLine = list => (list.length > 1 ? 'Badges earned: ' : 'Badge earned: ') + list.map(b => b.name).join(', ') + '.';
+
+/* emblems: a starburst medal with one simple picture each, drawn here so there are no image files to load */
+const BURST = (() => { const pts = []; for (let i = 0; i < 28; i++) { const a = Math.PI * 2 * i / 28 - Math.PI / 2, r = i % 2 ? 26.5 : 30.5; pts.push((32 + r * Math.cos(a)).toFixed(1) + ',' + (32 + r * Math.sin(a)).toFixed(1)); } return pts.join(' '); })();
+const GLYPHS = {
+  spark: '<circle cx="12" cy="12" r="3" fill="currentColor" stroke="none"/><path d="M12 2.5v4M12 17.5v4M2.5 12h4M17.5 12h4M5.3 5.3l2.8 2.8M15.9 15.9l2.8 2.8M5.3 18.7l2.8-2.8M15.9 8.1l2.8-2.8"/>',
+  sign: '<path d="M4.5 10.5l1.5-5h12l1.5 5z"/><path d="M5.5 10.5v9h13v-9"/><path d="M10 19.5v-5h4v5"/><path d="M9.2 5.5l-.7 5M14.8 5.5l.7 5"/>',
+  tree: '<circle cx="12" cy="8.8" r="5.6"/><path d="M12 10.5V21M12 15.5l3-2.6M7 21h10"/>',
+  half: '<circle cx="12" cy="12" r="8.5"/><path d="M12 3.5a8.5 8.5 0 0 0 0 17z" fill="currentColor"/>',
+  donut: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3"/><path d="M7.4 8.6l1.2 1M15.2 6.9l-.6 1.4M17 13.6l-1.5-.3M9 17l.8-1.3M14.6 17.2l-.9-1.2"/>',
+  steps: '<ellipse cx="8.4" cy="15.2" rx="2.7" ry="4.3" fill="currentColor" stroke="none" transform="rotate(-12 8.4 15.2)"/><ellipse cx="15.6" cy="8.8" rx="2.7" ry="4.3" fill="currentColor" stroke="none" transform="rotate(12 15.6 8.8)"/>',
+  wheel: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><path d="M12 3.5v17M4.6 7.8l14.8 8.4M4.6 16.2l14.8-8.4"/>',
+  book: '<path d="M12 7.2C10 5.8 7 5.4 4 5.9v11.4c3-.5 6-.1 8 1.3 2-1.4 5-1.8 8-1.3V5.9c-3-.5-6-.1-8 1.3z"/><path d="M12 7.2v11.4"/>',
+  atom: '<ellipse cx="12" cy="12" rx="9.5" ry="3.8"/><ellipse cx="12" cy="12" rx="9.5" ry="3.8" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="9.5" ry="3.8" transform="rotate(120 12 12)"/><circle cx="12" cy="12" r="1.8" fill="currentColor" stroke="none"/>'
+};
+const TONES = ['walk', 'eat', 'wheels', 'ink'];
+function emblemSvg(b, on) {
+  const tone = TONES.indexOf(b.tone) >= 0 ? b.tone : 'walk';
+  const glyph = Object.prototype.hasOwnProperty.call(GLYPHS, b.icon) ? GLYPHS[b.icon] : GLYPHS.spark;
+  return '<svg class="emblem' + (on ? '' : ' is-locked') + '" data-tone="' + tone + '" viewBox="0 0 64 64" aria-hidden="true"><polygon class="burst" points="' + BURST + '"/><circle class="disc" cx="32" cy="32" r="20"/>' +
+    '<g class="glyph" transform="translate(20 20)" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + glyph + '</g></svg>';
+}
+const badgesEl = $('#view-badges'), openBadges = new Set();
+function shortDate(iso) { const d = new Date(iso); if (isNaN(d)) return ''; try { return d.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }); } catch (e) { return ''; } }
+function badgeDetail(b, pr) {
+  const r = b.rule || {}, box = make('div', 'badge-detail');
+  if (r.type === 'badges') {
+    r.ids.forEach(id => { const o = BADGE_BY.get(id); if (!o) return; const c = make('span', 'need-chip' + (earned(id) ? ' is-visited' : '')); if (earned(id)) c.appendChild(checkEl('mini-check')); c.appendChild(document.createTextNode(o.name)); box.appendChild(c); });
+    return { label: 'Which badges count', node: box };
+  }
+  if (r.type === 'triviaCorrect') {
+    box.appendChild(make('p', '', "Each stop's question unlocks when you check in there. Miss one and a fresh question comes up, so keep at it."));
+    return { label: 'How trivia works', node: box };
+  }
+  if (!pr.pool || pr.pool.length === STOPS.length) return null;
+  pr.pool.forEach(id => {
+    const s = BYID.get(id), c = make('button', 'stop-chip' + (visited(id) ? ' is-visited' : '')); c.type = 'button'; c.dataset.id = id; c.dataset.group = s.group; c.id = 'chip-' + b.id + '-' + id;
+    c.appendChild(make('i', '', s.order)); c.appendChild(make('span', '', s.name)); if (visited(id)) c.appendChild(checkEl('mini-check'));
+    c.setAttribute('aria-label', s.name + (visited(id) ? ', visited' : ', not visited yet')); box.appendChild(c);
+  });
+  return { label: 'Which stops count', node: box };
+}
+function renderBadges() {
+  const keep = badgesEl.scrollTop, active = document.activeElement, focusId = active && badgesEl.contains(active) ? active.id : '';
+  badgesEl.textContent = '';
+  const got = BADGES.filter(b => earned(b.id)).length;
+  const intro = make('div', 'list-intro'); intro.appendChild(make('h2', '', 'Badges'));
+  intro.appendChild(make('p', '', !got ? 'Nothing stamped yet. Check in at any stop to earn your first badge.' : got === BADGES.length ? 'Every badge earned. The Atomic City is yours.' : 'Check in at stops and answer trivia to earn the rest.'));
+  const stats = make('div', 'stats');
+  const s1 = make('span', 'stat is-main', got + ' of ' + BADGES.length + ' badges'); s1.id = 'badges-earned';
+  const s2 = make('span', 'stat', visitedCount() + ' of ' + STOPS.length + ' stops'); s2.id = 'badges-stops';
+  const s3 = make('span', 'stat', solvedCount() + ' of ' + STOPS.length + ' trivia'); s3.id = 'badges-trivia';
+  stats.append(s1, s2, s3); intro.appendChild(stats); badgesEl.appendChild(intro);
+  const ul = make('ul', 'badges');
+  BADGES.forEach(b => {
+    const pr = badgeProgress(b), on = earned(b.id);
+    const li = make('li', 'badge' + (on ? ' is-earned' : '')); li.id = 'badge-' + b.id;
+    const art = make('div', 'badge-art'); art.innerHTML = emblemSvg(b, on);
+    const body = make('div', 'badge-body'); body.appendChild(make('h3', '', b.name)); body.appendChild(make('p', 'badge-blurb', b.blurb));
+    const meter = make('div', 'badge-meter'), track = make('span', 'progress-track'), fill = make('i', 'progress-fill'); fill.style.width = (100 * pr.have / pr.need).toFixed(0) + '%'; track.appendChild(fill);
+    meter.append(track, make('span', 'progress-label', pr.have + ' of ' + pr.need)); body.appendChild(meter);
+    if (on) { const stt = make('p', 'badge-status'); stt.appendChild(checkEl('mini-check')); stt.appendChild(document.createTextNode('Earned ' + shortDate(progress.badges[b.id]))); body.appendChild(stt); }
+    li.append(art, body);
+    const detail = badgeDetail(b, pr);
+    if (detail) {
+      const open = openBadges.has(b.id), more = make('button', 'link-btn badge-more', detail.label);
+      more.type = 'button'; more.id = 'more-' + b.id; more.dataset.badge = b.id; more.setAttribute('aria-expanded', String(open)); more.setAttribute('aria-controls', 'detail-' + b.id);
+      body.appendChild(more); detail.node.id = 'detail-' + b.id; detail.node.hidden = !open; li.appendChild(detail.node);
+    }
+    ul.appendChild(li);
+  });
+  badgesEl.appendChild(ul);
+  badgesEl.scrollTop = keep;
+  if (focusId) { const f = document.getElementById(focusId); if (f) f.focus({ preventScroll: true }); }
+  const n = $('#tab-badge-count'); n.textContent = got; n.hidden = !got;
+  $('#seg-badges').setAttribute('aria-label', got ? 'Badges, ' + got + ' earned' : 'Badges');
+}
+badgesEl.addEventListener('click', e => {
+  const more = e.target.closest('.badge-more'), chip = e.target.closest('.stop-chip');
+  if (more) {
+    const id = more.dataset.badge; if (openBadges.has(id)) openBadges.delete(id); else openBadges.add(id);
+    const open = openBadges.has(id), d = document.getElementById('detail-' + id);
+    more.setAttribute('aria-expanded', String(open)); if (d) d.hidden = !open;
+  } else if (chip) openStop(chip.dataset.id);
+});
+
+/* the badge-earned moment */
+const award = $('#award'); let awardFocus = null;
+function showAward(list) {
+  $('#award-kicker').textContent = list.length > 1 ? list.length + ' badges earned' : 'Badge earned';
+  const ul = $('#award-list'); ul.textContent = '';
+  list.forEach(b => { const li = make('li'); li.innerHTML = emblemSvg(b, true); li.appendChild(make('h2', '', b.name)); li.appendChild(make('p', 'badge-blurb', b.blurb)); ul.appendChild(li); });
+  if (award.hidden) awardFocus = document.activeElement;
+  award.hidden = false; $('#award-close').focus({ preventScroll: true });
+}
+function closeAward(toBadges) {
+  if (award.hidden) return;
+  award.hidden = true;
+  const back = awardFocus; awardFocus = null;
+  if (toBadges) { closeCard(); switchView('badges'); badgesEl.scrollTop = 0; $('#seg-badges').focus({ preventScroll: true }); return; }
+  const target = back && back !== document.body && document.contains(back) ? back : (!card.hidden ? $('#card-title') : null);
+  if (target) { try { target.focus({ preventScroll: true }); } catch (e) { /* fine */ } }
+}
+$('#award-close').addEventListener('click', () => closeAward(false));
+$('#award-see').addEventListener('click', () => closeAward(true));
+award.addEventListener('click', e => { if (e.target === award) closeAward(false); });
+award.addEventListener('keydown', e => {
+  if (e.key !== 'Tab') return;
+  const a = $('#award-see'), b = $('#award-close');
+  if (e.shiftKey && document.activeElement === a) { e.preventDefault(); b.focus(); }
+  else if (!e.shiftKey && document.activeElement === b) { e.preventDefault(); a.focus(); }
+});
+
+/* ================= next stop: where to go once this one is stamped ================= */
+function nextStopFor(id) {
+  const s = BYID.get(id); if (!s) return null;
+  const open = STOPS.filter(x => x.id !== id && !visited(x.id)); if (!open.length) return null;
+  const inGroup = g => open.filter(x => x.group === g);
+  const after = list => list.filter(x => x.order > s.order)[0] || list[0] || null;                 // carry on in order, then loop back to any that were skipped
+  const near = list => list.slice().sort((a, b) => metersBetween(s.lat, s.lng, a.lat, a.lng) - metersBetween(s.lat, s.lng, b.lat, b.lng))[0] || null;
+  if (s.group === 'eat') return near(inGroup('walk')) || near(inGroup('eat')) || near(open);       // a food stop sends you back to the walk
+  return after(inGroup(s.group)) || near(open);
+}
+const CHEV_SVG = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 2l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+function renderNextUp() {
+  const box = $('#card-nextup'), s = BYID.get(state.selected); if (!s) return;
+  box.textContent = ''; box.hidden = !visited(s.id); if (box.hidden) return;
+  box.appendChild(make('h3', 'nextup-label', 'Next up'));
+  const n = nextStopFor(s.id);
+  if (!n) {
+    box.appendChild(make('p', 'nextup-done', 'Every stop is stamped. Your passport is full.'));
+    const pb = make('button', 'btn btn-sm', 'See my passport'); pb.type = 'button'; pb.id = 'nextup-passport'; box.appendChild(pb); return;
+  }
+  const b = make('button', 'nextup-btn'); b.type = 'button'; b.id = 'nextup-go'; b.dataset.id = n.id; b.dataset.group = n.group;
+  const t = make('span');
+  t.append(make('span', 'nextup-name', n.name),
+    make('span', 'nextup-dist', 'About ' + niceDistance(metersBetween(s.lat, s.lng, n.lat, n.lng)) + ' from here' + (n.group !== s.group ? ', on the ' + GNAME[n.group].toLowerCase() + ' list' : '')));
+  const ch = make('span'); ch.innerHTML = CHEV_SVG;
+  b.append(make('span', 'row-num', n.order), t, ch); box.appendChild(b);
+}
+$('#card-nextup').addEventListener('click', e => {
+  const go = e.target.closest('#nextup-go');
+  if (go) openStop(go.dataset.id, { keepFocus: true });
+  else if (e.target.closest('#nextup-passport')) { closeCard(); switchView('passport'); }
+});
+
+/* ================= passport page: name, a dated stamp per stop, the badge row ================= */
+const passEl = $('#view-passport');
+function stampDate(iso) { const d = new Date(iso); if (isNaN(d)) return ''; try { return d.toLocaleDateString([], { month: 'short', day: 'numeric' }); } catch (e) { return ''; } }
+function buildPassport() {
+  passEl.textContent = '';
+  const pp = make('div', 'pp');
+  pp.appendChild(make('p', 'pp-kicker', DATA.app.zone));
+  const owner = make('div', 'pp-owner'), lab = make('label', '', 'This passport belongs to'); lab.htmlFor = 'pp-name';
+  const inp = make('input', 'pp-name'); inp.id = 'pp-name'; inp.type = 'text'; inp.maxLength = 28; inp.placeholder = 'Tap to sign'; inp.autocomplete = 'off'; inp.spellcheck = false;
+  inp.setAttribute('enterkeyhint', 'done'); inp.value = progress.name || '';
+  owner.append(lab, inp); pp.appendChild(owner);
+  const ol = make('ol', 'slots'); ol.id = 'slots';
+  STOPS.forEach(s => {
+    const li = make('li'), b = make('button', 'slot'); b.type = 'button'; b.id = 'slot-' + s.id; b.dataset.id = s.id; b.dataset.group = s.group;
+    b.style.setProperty('--tilt', (((s.order * 37) % 13) - 6) + 'deg');          // each stamp sits a little crooked, the same way every time
+    const disc = make('span', 'slot-disc'); disc.append(make('span', 'slot-no', s.order), make('span', 'slot-date'));
+    b.append(disc, make('span', 'slot-name', s.short || s.name)); li.appendChild(b); ol.appendChild(li);
+  });
+  pp.appendChild(ol);
+  const br = make('div', 'pp-badges'); br.id = 'pp-badges'; br.setAttribute('role', 'img'); pp.appendChild(br);
+  const sum = make('p', 'pp-sum'); sum.id = 'pp-sum'; pp.appendChild(sum);
+  const issued = make('p', 'pp-issued'); issued.id = 'pp-issued'; pp.appendChild(issued);
+  const act = make('div', 'pp-actions'), sb = make('button', 'btn btn-sm', 'Share'); sb.type = 'button'; sb.id = 'pp-share';
+  act.append(sb, make('p', 'pp-hint', 'Take a screenshot of this page to keep it or send it.')); pp.appendChild(act);
+  passEl.appendChild(pp);
+}
+function renderPassport() {
+  if (!$('#slots')) return;
+  STOPS.forEach(s => {
+    const b = $('#slot-' + s.id); if (!b) return;
+    const on = visited(s.id), when = on ? stampDate(progress.visits[s.id].t) : '';
+    b.classList.toggle('is-inked', on); $('.slot-date', b).textContent = when;
+    b.setAttribute('aria-label', 'Stop ' + s.order + ', ' + s.name + (on ? ', stamped' + (when ? ' ' + when : '') : ', not stamped yet'));
+  });
+  const got = BADGES.filter(b => earned(b.id)).length, row = $('#pp-badges');
+  row.innerHTML = BADGES.map(b => emblemSvg(b, earned(b.id))).join(''); row.setAttribute('aria-label', got + ' of ' + BADGES.length + ' badges earned');
+  const n = visitedCount();
+  $('#pp-sum').textContent = n ? n + ' of ' + STOPS.length + ' stamps, ' + got + ' of ' + BADGES.length + ' badges' : 'No stamps yet. Check in at a stop to ink your first one.';
+  const first = Object.keys(progress.visits).map(k => progress.visits[k] && progress.visits[k].t).filter(t => t && !isNaN(new Date(t))).sort()[0];
+  $('#pp-issued').textContent = first ? 'First stamp ' + shortDate(first) + '.' : '';
+}
+passEl.addEventListener('click', e => {
+  const sl = e.target.closest('.slot');
+  if (sl) openStop(sl.dataset.id); else if (e.target.closest('#pp-share')) openShare();
+});
+passEl.addEventListener('input', e => { if (e.target.id === 'pp-name') { progress.name = e.target.value.slice(0, 28); saveProgress(); } });
+passEl.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.id === 'pp-name') e.target.blur(); });
+
+/* ================= welcome, about and share ================= */
+const welcome = $('#welcome'), about = $('#about'), share = $('#share');
+let dialogFocus = null;
+function openDialog(d, focusSel) {
+  if (d.hidden) dialogFocus = document.activeElement;
+  d.hidden = false; const p = $('.modal-panel', d); if (p) p.scrollTop = 0;
+  const f = $(focusSel, d); if (f) f.focus({ preventScroll: true });
+}
+function closeDialog(d) {
+  if (d.hidden) return; d.hidden = true;
+  const back = dialogFocus; dialogFocus = null;
+  if (back && back !== document.body && document.contains(back)) { try { back.focus({ preventScroll: true }); } catch (e) { /* fine */ } }
+}
+function closeWelcome() { store.set('welcomed', true); closeDialog(welcome); }
+function closeAbout() { renderReset(false); closeDialog(about); }
+function openAbout() { renderReset(false); openDialog(about, '#about-close'); }
+[welcome, about, share].forEach(d => {
+  d.addEventListener('click', e => { if (e.target !== d) return; if (d === welcome) closeWelcome(); else if (d === about) closeAbout(); else closeDialog(d); });
+  d.addEventListener('keydown', e => {                         // keep Tab inside the open dialog
+    if (e.key !== 'Tab') return;
+    const f = Array.prototype.filter.call(d.querySelectorAll('button, a[href], input, textarea'), x => !x.disabled && x.offsetParent !== null); if (!f.length) return;
+    if (e.shiftKey && document.activeElement === f[0]) { e.preventDefault(); f[f.length - 1].focus(); }
+    else if (!e.shiftKey && document.activeElement === f[f.length - 1]) { e.preventDefault(); f[0].focus(); }
+  });
+});
+$('#welcome-go').addEventListener('click', closeWelcome);
+$('#welcome-more').addEventListener('click', () => { closeWelcome(); openAbout(); });
+$('#about-close').addEventListener('click', closeAbout);
+$('#about-welcome').addEventListener('click', () => { closeAbout(); openDialog(welcome, '#welcome-go'); });
+$('#btn-about').addEventListener('click', openAbout);
+about.addEventListener('click', e => {
+  if (e.target.closest('#reset-ask')) renderReset(true);
+  else if (e.target.closest('#reset-no')) renderReset(false);
+  else if (e.target.closest('#reset-yes')) { progress.visits = {}; progress.trivia = {}; progress.badges = {}; shuffles.clear(); commit(); closeAbout(); toast('Progress cleared.'); }
+});
+function fillAbout() {
+  $('#welcome-kicker').textContent = DATA.app.zone;
+  $('#welcome-lede').textContent = STOPS.length + ' stops in the city the Manhattan Project built. Here is how it works.';
+  $('#about-facts').textContent = 'Every story comes from the sources named on its card, listed together below. Stories and hours were checked in ' + niceDate(DATA.app.factsChecked) + '. Hours change, so treat them as a guide.';
+  const ul = $('#about-sources'), seen = new Set(); ul.textContent = '';
+  STOPS.forEach(s => s.sources.forEach(x => { if (!seen.has(x)) { seen.add(x); ul.appendChild(make('li', '', x)); } }));
+  $('#about-map').textContent = (tiles.can
+    ? 'The street map comes from OpenStreetMap. If it cannot load, the app shows a drawn map instead, with pins at real coordinates and simplified streets. The layers button on the map switches between the two.'
+    : 'This copy shows a drawn map, with pins at real coordinates and simplified streets. Hosted at its own web address, the app shows a street map from OpenStreetMap instead.')
+    + ' For turn-by-turn directions, use the Directions button on any stop.';
+  $('#about-foot').textContent = DATA.app.name + '. ' + DATA.app.zone + '. Data version ' + DATA.app.dataVersion + '.';
+}
+
+/* sharing: the phone's own share sheet where the browser allows it, a copied message everywhere else */
+function shareUrl() {
+  if (DATA.app.shareUrl) return String(DATA.app.shareUrl);
+  return HOSTED ? location.origin + location.pathname : '';
+}
+function shareText() {
+  const n = visitedCount(), b = BADGES.filter(x => earned(x.id)).length, url = shareUrl();
+  const core = n
+    ? "I've stamped " + n + ' of ' + STOPS.length + ' stops' + (b ? ' and earned ' + b + (b === 1 ? ' badge' : ' badges') : '') + ' on the ' + DATA.app.name + ', a self-guided tour of Atomic Richland, the city the Manhattan Project built. Come earn yours.'
+    : 'Come explore Atomic Richland with the ' + DATA.app.name + ': ' + STOPS.length + ' stops, trivia and badges in the city the Manhattan Project built.';
+  return core + (url ? ' ' + url : '');
+}
+function canNativeShare() {
+  if (typeof navigator.share !== 'function') return false;
+  try {         // a frame can be denied the share sheet; only trust the answer where the browser knows the feature by name
+    const pol = document.permissionsPolicy || document.featurePolicy;
+    if (pol && pol.features && pol.allowsFeature && pol.features().indexOf('web-share') >= 0 && !pol.allowsFeature('web-share')) return false;
+  } catch (e) { /* not supported */ }
+  return true;
+}
+function openShare() {
+  const native = canNativeShare();
+  $('#share-text').value = shareText(); $('#share-note').hidden = !!shareUrl();
+  $('#share-send').hidden = !native; $('#share-copy').classList.toggle('btn-solid', !native);
+  openDialog(share, native ? '#share-send' : '#share-copy');
+  const ta = $('#share-text'); ta.style.height = 'auto'; ta.style.height = (ta.scrollHeight + 4) + 'px';      // show the whole message, no inner scrolling
+}
+function copyShare() {
+  const ta = $('#share-text');
+  const done = ok => { if (ok) { closeDialog(share); toast('Message copied. Paste it into a text or an email.', 5000); } else { toast('Could not copy here. Press and hold the message to copy it.', 6000); ta.focus(); ta.select(); } };
+  let allowed = !!(navigator.clipboard && navigator.clipboard.writeText);
+  try { const pol = document.permissionsPolicy || document.featurePolicy; if (pol && pol.features && pol.allowsFeature && pol.features().indexOf('clipboard-write') >= 0 && !pol.allowsFeature('clipboard-write')) allowed = false; } catch (e) { /* not supported */ }
+  if (!allowed) { done(false); return; }                     // a frame that may not copy: go straight to press-and-hold
+  try { navigator.clipboard.writeText(ta.value).then(() => done(true), () => done(false)); } catch (e) { done(false); }
+}
+$('#btn-share').addEventListener('click', openShare);
+$('#share-close').addEventListener('click', () => closeDialog(share));
+$('#share-copy').addEventListener('click', copyShare);
+$('#share-send').addEventListener('click', () => {
+  const text = $('#share-text').value;
+  let p; try { p = navigator.share({ title: DATA.app.name, text }); } catch (e) { p = Promise.reject(e); }
+  Promise.resolve(p).then(() => closeDialog(share), err => { if (err && err.name === 'AbortError') return; $('#share-send').hidden = true; $('#share-copy').classList.add('btn-solid'); copyShare(); });
+});
+
+/* ================= field tools: for whoever maintains the tour, to check pins and check-in circles on site ================= */
+const field = { on: false, pins: {}, notes: {} };
+let cap = { state: 'idle' };          // idle | reading | error
+function loadField() {
+  const f = store.get('field', null); if (!f || typeof f !== 'object') return;
+  field.on = !!f.on;
+  if (f.pins && typeof f.pins === 'object') Object.keys(f.pins).forEach(id => { const p = f.pins[id]; if (BYID.has(id) && p && isFinite(p.lat) && isFinite(p.lng)) field.pins[id] = { lat: +p.lat, lng: +p.lng, acc: +p.acc || 0, n: +p.n || 1, t: String(p.t || '') }; });
+  if (f.notes && typeof f.notes === 'object') Object.keys(f.notes).forEach(id => { if (BYID.has(id) && typeof f.notes[id] === 'string' && f.notes[id]) field.notes[id] = f.notes[id].slice(0, 400); });
+}
+function saveField() { store.set('field', field); }
+const fix6 = v => (+v).toFixed(6);
+function renderField() {
+  const box = $('#card-field'), s = BYID.get(state.selected); if (!s) return;
+  box.hidden = !field.on; if (box.hidden) { box.textContent = ''; return; }
+  const keep = document.activeElement && document.activeElement.id === 'field-note' ? document.activeElement.selectionStart : null;
+  box.textContent = '';
+  box.appendChild(make('h3', 'nextup-label', 'Field tools'));
+  const pin = make('p', 'field-line', 'Pin now: ' + fix6(s.lat) + ', ' + fix6(s.lng) + '. Check-in circle ' + s.radiusM + ' m.'); pin.id = 'field-pin'; box.appendChild(pin);
+  const v = progress.visits[s.id];
+  if (v) { const ln = make('p', 'field-line', 'Last check-in: ' + (v.m === 'gps' ? 'by GPS' + (v.d != null ? ', ' + v.d + ' m from the pin' : '') + (v.a != null ? ', good to ' + v.a + ' m' : '') : 'by tap, so no distance was measured') + '.'); ln.id = 'field-visit'; box.appendChild(ln); }
+  const c = field.pins[s.id];
+  if (c) {
+    const off = Math.round(metersBetween(s.lat, s.lng, c.lat, c.lng));
+    const got = make('p', 'field-line is-strong', 'Captured ' + fix6(c.lat) + ', ' + fix6(c.lng) + ', good to ' + Math.round(c.acc) + ' m, from ' + c.n + (c.n === 1 ? ' reading' : ' readings') + '.'); got.id = 'field-got'; box.appendChild(got);
+    const cmp = make('p', 'field-line', 'That is ' + off + ' m from the pin, ' + (off <= s.radiusM ? 'inside' : 'outside') + ' the ' + s.radiusM + ' m check-in circle.'); cmp.id = 'field-off'; box.appendChild(cmp);
+  }
+  if (cap.state === 'error') box.appendChild(make('p', 'field-line', 'Could not get a GPS reading. Step into the open and try again.'));
+  const row = make('div', 'field-actions');
+  if (locator.state === 'off') { const no = make('p', 'field-line', 'Capturing needs GPS, which is off here. Notes still work.'); no.id = 'field-nogps'; box.appendChild(no); }
+  else { const b = make('button', 'btn btn-sm' + (c ? '' : ' btn-solid'), cap.state === 'reading' ? 'Reading GPS...' : c ? 'Capture again' : 'Capture this spot'); b.type = 'button'; b.id = 'field-capture'; b.disabled = cap.state === 'reading'; row.appendChild(b); }
+  if (c) { const x = make('button', 'link-btn', 'Clear capture'); x.type = 'button'; x.id = 'field-uncapture'; row.appendChild(x); }
+  if (row.children.length) box.appendChild(row);
+  const lab = make('label', 'field-line', 'Field note for this stop'); lab.htmlFor = 'field-note'; box.appendChild(lab);
+  const ta = make('textarea', 'field-note'); ta.id = 'field-note'; ta.rows = 2; ta.maxLength = 400; ta.placeholder = 'Where the pin should sit, what is in view, anything that has changed.'; ta.value = field.notes[s.id] || ''; box.appendChild(ta);
+  if (keep != null) { ta.focus({ preventScroll: true }); try { ta.setSelectionRange(keep, keep); } catch (e) { /* fine */ } }
+}
+function captureHere() {
+  const id = state.selected, s = BYID.get(id); if (!s || cap.state === 'reading') return;
+  cap = { state: 'reading' }; renderField();
+  locator.sample(5000).then(f => {
+    field.pins[id] = { lat: f.lat, lng: f.lng, acc: f.acc, n: f.n, t: new Date().toISOString() }; saveField();
+    cap = { state: 'idle' }; onLocatorChange(); renderField(); renderFieldSummary(); toast('Captured for ' + s.name + '.');
+  }).catch(() => { cap = { state: 'error' }; onLocatorChange(); renderField(); });
+}
+$('#card-field').addEventListener('click', e => {
+  if (!state.selected) return;
+  if (e.target.closest('#field-capture')) captureHere();
+  else if (e.target.closest('#field-uncapture')) { delete field.pins[state.selected]; saveField(); cap = { state: 'idle' }; renderField(); renderFieldSummary(); render(); }
+});
+$('#card-field').addEventListener('input', e => {
+  if (e.target.id !== 'field-note' || !state.selected) return;
+  const v = e.target.value.slice(0, 400); if (v) field.notes[state.selected] = v; else delete field.notes[state.selected];
+  saveField(); renderFieldSummary();
+});
+function fieldReport() {
+  return JSON.stringify({
+    report: DATA.app.name + ' field report', made: new Date().toISOString(), dataVersion: DATA.app.dataVersion,
+    page: HOSTED ? location.origin + location.pathname : 'preview', device: navigator.userAgent,
+    stops: STOPS.map(s => {
+      const c = field.pins[s.id], v = progress.visits[s.id];
+      return { order: s.order, id: s.id, name: s.name, pin: [s.lat, s.lng], radiusM: s.radiusM,
+        captured: c ? { lat: +fix6(c.lat), lng: +fix6(c.lng), accuracyM: Math.round(c.acc), readings: c.n, at: c.t, offsetM: Math.round(metersBetween(s.lat, s.lng, c.lat, c.lng)) } : null,
+        checkIn: v ? { how: v.m === 'gps' ? 'gps' : 'tap', at: v.t, distanceM: v.d == null ? null : v.d, accuracyM: v.a == null ? null : v.a } : null,
+        note: field.notes[s.id] || '' };
+    })
+  }, null, 1);
+}
+function renderFieldSummary(mode) {
+  const box = $('#field-box'); if (!box) return; box.textContent = '';
+  const tg = make('button', 'btn', field.on ? 'Turn field tools off' : 'Turn field tools on'); tg.type = 'button'; tg.id = 'field-toggle'; tg.setAttribute('aria-pressed', String(field.on)); box.appendChild(tg);
+  if (!field.on) return;
+  const np = Object.keys(field.pins).length, nn = Object.keys(field.notes).length;
+  const sum = make('p', '', np + (np === 1 ? ' pin' : ' pins') + ' captured, ' + nn + (nn === 1 ? ' note' : ' notes') + ', ' + visitedCount() + (visitedCount() === 1 ? ' check-in' : ' check-ins') + ' on this phone.'); sum.id = 'field-sum'; box.appendChild(sum);
+  box.appendChild(make('p', 'about-small', 'The report lists every pin with your captures, notes and check-in distances, plus this browser\'s name. Send it back to update the tour.'));
+  const row = make('div', 'field-actions');
+  const cp = make('button', 'btn btn-solid', 'Copy field report'); cp.type = 'button'; cp.id = 'field-copy'; row.appendChild(cp);
+  if (HOSTED) { const sv = make('button', 'btn', 'Save as a file'); sv.type = 'button'; sv.id = 'field-save'; row.appendChild(sv); }
+  box.appendChild(row);
+  if (mode === 'show') { const ta = make('textarea', 'field-out'); ta.id = 'field-out'; ta.readOnly = true; ta.rows = 8; ta.value = fieldReport(); ta.setAttribute('aria-label', 'Field report'); box.appendChild(ta); ta.focus(); ta.select(); }
+  const cl = make('div', 'reset-row');
+  if (mode === 'clear') { const q = make('span', '', 'Erase every captured pin and field note?'); const y = make('button', 'link-btn', 'Yes, erase them'); y.type = 'button'; y.id = 'field-clear-yes'; const n = make('button', 'link-btn', 'Keep them'); n.type = 'button'; n.id = 'field-clear-no'; cl.append(q, y, n); }
+  else { const c = make('button', 'link-btn', 'Clear field data'); c.type = 'button'; c.id = 'field-clear'; cl.appendChild(c); }
+  box.appendChild(cl);
+}
+function copyField() {
+  const text = fieldReport();
+  const fail = () => { renderFieldSummary('show'); toast('Could not copy here. The report is selected below: press and hold to copy it.', 6000); };
+  let allowed = !!(navigator.clipboard && navigator.clipboard.writeText);
+  try { const pol = document.permissionsPolicy || document.featurePolicy; if (pol && pol.features && pol.allowsFeature && pol.features().indexOf('clipboard-write') >= 0 && !pol.allowsFeature('clipboard-write')) allowed = false; } catch (e) { /* not supported */ }
+  if (!allowed) { fail(); return; }
+  try { navigator.clipboard.writeText(text).then(() => toast('Field report copied. Paste it into a message.', 5000), fail); } catch (e) { fail(); }
+}
+function saveFieldFile() {
+  try {
+    const url = URL.createObjectURL(new Blob([fieldReport()], { type: 'application/json' })), a = document.createElement('a');
+    a.href = url; a.download = 'passport-field-report-' + new Date().toISOString().slice(0, 10) + '.json'; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000); toast('Field report saved to your downloads.', 5000);
+  } catch (e) { renderFieldSummary('show'); }
+}
+$('#field-box').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  if (b.id === 'field-toggle') { field.on = !field.on; saveField(); renderFieldSummary(); if (state.selected) renderField(); render(); const again = $('#field-toggle'); if (again) again.focus({ preventScroll: true }); }
+  else if (b.id === 'field-copy') copyField();
+  else if (b.id === 'field-save') saveFieldFile();
+  else if (b.id === 'field-clear') renderFieldSummary('clear');
+  else if (b.id === 'field-clear-no') renderFieldSummary();
+  else if (b.id === 'field-clear-yes') { field.pins = {}; field.notes = {}; saveField(); renderFieldSummary(); if (state.selected) renderField(); render(); toast('Field data cleared.'); }
+});
+
+/* ================= views and links ================= */
+const VIEWS = ['map', 'stops', 'badges', 'passport'];
+function syncTabs() {            // when wide, the map is always showing, so the choice is between the list and the badges
+  const v = state.view, wide = isWide();
+  $('#seg-map').setAttribute('aria-pressed', String(v === 'map'));
+  $('#seg-stops').setAttribute('aria-pressed', String(v === 'stops' || (wide && v === 'map')));
+  $('#seg-badges').setAttribute('aria-pressed', String(v === 'badges'));
+  $('#seg-passport').setAttribute('aria-pressed', String(v === 'passport'));
+}
+function switchView(v, opts = {}) {
+  if (VIEWS.indexOf(v) < 0) return;
+  state.view = v; app.dataset.view = v; syncTabs();
+  if (v === 'map' || v === 'stops') store.set('view', v);
+  if (!opts.silent && !state.selected) setHash(v);
+  requestAnimationFrame(resize);
+}
+function tabTo(v) { if (state.selected && (isWide() || v === 'badges' || v === 'passport')) closeCard(); switchView(v); }
+$('#seg-map').addEventListener('click', () => tabTo('map'));
+$('#seg-stops').addEventListener('click', () => tabTo('stops'));
+$('#seg-badges').addEventListener('click', () => tabTo('badges'));
+$('#seg-passport').addEventListener('click', () => tabTo('passport'));
+function setHash(h) { try { if (location.hash !== '#' + h) location.hash = h; } catch (e) { /* no hash in this frame */ } }
+function applyHash() {
+  const h = (location.hash || '').replace(/^#/, '');
+  if (h.indexOf('s-') === 0 && BYID.has(h.slice(2))) { if (state.selected !== h.slice(2)) openStop(h.slice(2), { noFocus: true }); }
+  else { if (VIEWS.indexOf(h) >= 0) { if (state.view !== h) switchView(h, { silent: true }); } if (state.selected && (VIEWS.indexOf(h) >= 0 || h === '')) closeCard(); }
+}
+window.addEventListener('hashchange', applyHash);
+
+/* ================= start ================= */
+function start(saved) {
+  saved = saved || {};
+  loadProgress(); loadField();
+  const at = $('#map-attrib'); at.textContent = MAPCFG.attribution || ''; if (/^https:\/\//.test(MAPCFG.attributionUrl || '')) at.href = MAPCFG.attributionUrl;
+  setMapStyle(store.get('mapstyle', 'street'), true);      // street map wherever the app has its own address, unless the person chose the drawn one
+  const had = JSON.stringify(progress.badges); syncBadges();        // quietly square the badges with what was saved (an older save has none)
+  if (JSON.stringify(progress.badges) !== had) saveProgress();
+  try { document.documentElement.lang = 'en'; } catch (e) { /* fine */ }
+  buildList(); buildPassport(); fillAbout(); renderReset(false); refreshProgress();
+  locator.probe().then(onLocatorChange, onLocatorChange);
+  const h = (location.hash || '').replace(/^#/, '');
+  const firstView = saved.view || (VIEWS.indexOf(h) >= 0 ? h : store.get('view', 'map'));
+  switchView(VIEWS.indexOf(firstView) >= 0 ? firstView : 'map', { silent: true });
+  if (saved.map && isFinite(saved.map.s)) { pendingFit = null; state.preset = null; requestAnimationFrame(() => { resize(); setView(saved.map); markPreset(); }); }
+  if (saved.selected && BYID.has(saved.selected)) openStop(saved.selected, { noFocus: true });
+  else applyHash();
+  if (!saved.view && !store.get('welcomed', false) && !visitedCount()) openDialog(welcome, '#welcome-go');      // first visit only
+  if (window.ResizeObserver) new ResizeObserver(() => resize()).observe(mapEl); else window.addEventListener('resize', resize);
+  const recolor = () => { colors = null; render(); };
+  if (window.matchMedia) { const wq = matchMedia('(min-width: 900px)'); wq.addEventListener ? wq.addEventListener('change', syncTabs) : wq.addListener(syncTabs); }
+  if (window.matchMedia) { const mq = matchMedia('(prefers-color-scheme: dark)'); mq.addEventListener ? mq.addEventListener('change', recolor) : mq.addListener(recolor); }
+  new MutationObserver(recolor).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => render());
+}
+const hot = window.claude && window.claude.hot;
+if (hot && typeof hot.snapshot === 'function') { try { hot.snapshot(() => ({ view: state.view, selected: state.selected, map: { s: view.s, tx: view.tx, ty: view.ty } })); } catch (e) { /* optional */ } }
+if (hot && typeof hot.ready === 'function') hot.ready(start); else start((hot && hot.data) || {});
+})();
+</script>
+</body></html>
